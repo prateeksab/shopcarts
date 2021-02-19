@@ -18,8 +18,6 @@ assignees: ''
 - Additional?
 
 **Acceptance Criteria:**
-~~~
-Given 
-When 
-Then 
-~~~
+*Given* 
+*When* 
+*Then*
