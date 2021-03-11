@@ -39,3 +39,20 @@ def init_db():
     """ Initialies the SQLAlchemy app """
     global app
     Shopcart.init_db(app)
+
+
+@app.route('/shopcarts/<int:shopcart_id>/items', methods=['POST'])
+def create_items(shopcart_id):
+    """
+    Create an Item in a Shopcart
+    This endpoint will add an item to a shopcart
+    """
+    app.logger.info("Request to add an item to a shopcart")
+    check_content_type("application/json")
+    shopcart = Shopcart.find_or_404(shopcart_id)
+    item = CartItem()
+    item.deserialize(request.get_json())
+    shopcart.items.append(item)
+    shopcart.save()
+    message = item.serialize()
+    return make_response(jsonify(message), status.HTTP_201_CREATED)
