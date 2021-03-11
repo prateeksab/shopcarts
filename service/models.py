@@ -1,5 +1,5 @@
 """
-Models for YourResourceModel
+Models for Shopcart
 
 All of the models are stored in this module
 """
@@ -14,66 +14,79 @@ db = SQLAlchemy()
 
 class DataValidationError(Exception):
     """ Used for an data validation errors when deserializing """
-
     pass
 
 
-class YourResourceModel(db.Model):
+class Shopcart(db.Model):
     """
-    Class that represents a <your resource model name>
+    Class that represents a Shopcart>
     """
 
     app = None
 
     # Table Schema
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(63))
+    customer_id = db.Column(db.Integer, nullable=False)
+    item_name = db.Column(db.String(260), nullable=False)
+    item_quantity = db.Column(db.Integer, nullable=False)
+    item_price = db.Column(db.Float, nullable=False)
 
     def __repr__(self):
-        return "<YourResourceModel %r id=[%s]>" % (self.name, self.id)
+        return "<Shopcart id=[%s] customer_id=[$s] item_name =[%s]>" % (self.id, self.customer_id, self.item_name)
 
     def create(self):
         """
-        Creates a YourResourceModel to the database
+        Creates a Shopcart to the database
         """
-        logger.info("Creating %s", self.name)
+        logger.info("Creating Shopcart %s", self.id)
         self.id = None  # id must be none to generate next primary key
         db.session.add(self)
         db.session.commit()
 
     def save(self):
         """
-        Updates a YourResourceModel to the database
+        Updates a Shopcart to the database
         """
-        logger.info("Saving %s", self.name)
+        logger.info("Saving %s", self.id)
         db.session.commit()
 
     def delete(self):
-        """ Removes a YourResourceModel from the data store """
-        logger.info("Deleting %s", self.name)
+        """ Removes a Shopcart from the data store """
+        logger.info("Deleting %s", self.id)
         db.session.delete(self)
         db.session.commit()
 
     def serialize(self):
-        """ Serializes a YourResourceModel into a dictionary """
-        return {"id": self.id, "name": self.name}
+        """ Serializes a Shopcart into a dictionary """
+        return {
+            "id": self.id,
+            "customer_id":self.customer_id,
+            "item_name":self.item_name,
+            "item_quantity":self.item_quantity,
+            "item_price":self.item_price
+        }
 
     def deserialize(self, data):
         """
-        Deserializes a YourResourceModel from a dictionary
+        Deserializes a Shopcart from a dictionary
 
         Args:
             data (dict): A dictionary containing the resource data
         """
         try:
-            self.name = data["name"]
+            self.id = data["id"]
+            self.customer_id = data["customer_id"]
+            self.item_name = data["item_name"]
+            self.item_quantity = data["item_quantity"]
+            self.item_price = data["item_price"]
+
         except KeyError as error:
             raise DataValidationError(
-                "Invalid YourResourceModel: missing " + error.args[0]
+                "Invalid Shopcart: missing " + error.args[0]
             )
         except TypeError as error:
             raise DataValidationError(
-                "Invalid YourResourceModel: body of request contained bad or no data"
+                "Invalid Shopcart: body of request contained bad or no data"
             )
         return self
 
@@ -89,28 +102,28 @@ class YourResourceModel(db.Model):
 
     @classmethod
     def all(cls):
-        """ Returns all of the YourResourceModels in the database """
-        logger.info("Processing all YourResourceModels")
+        """ Returns all of the Shopcarts in the database """
+        logger.info("Processing all Shopcarts")
         return cls.query.all()
 
     @classmethod
     def find(cls, by_id):
-        """ Finds a YourResourceModel by it's ID """
+        """ Finds a Shopcart by its ID """
         logger.info("Processing lookup for id %s ...", by_id)
         return cls.query.get(by_id)
 
     @classmethod
     def find_or_404(cls, by_id):
-        """ Find a YourResourceModel by it's id """
+        """ Find a Shopcart by its id """
         logger.info("Processing lookup or 404 for id %s ...", by_id)
         return cls.query.get_or_404(by_id)
 
     @classmethod
-    def find_by_name(cls, name):
-        """Returns all YourResourceModels with the given name
+    def find_by_name(cls, item_name):
+        """Returns all Shopcarts that has a specific item
 
         Args:
-            name (string): the name of the YourResourceModels you want to match
+            name (string): the name of an item in a Shopcart you want to match
         """
-        logger.info("Processing name query for %s ...", name)
-        return cls.query.filter(cls.name == name)
+        logger.info("Processing name query for %s ...", item_name)
+        return cls.query.filter(cls.item_name == item_name)
