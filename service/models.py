@@ -27,9 +27,11 @@ class Shopcart(db.Model):
     # Table Schema
     id = db.Column(db.Integer, primary_key=True)
     customer_id = db.Column(db.Integer, nullable=False)
+    item_sku = db.Column(db.Integer, nullable=False)
     item_name = db.Column(db.String(260), nullable=False)
     item_quantity = db.Column(db.Integer, nullable=False)
     item_price = db.Column(db.Float, nullable=False)
+
 
     def __repr__(self):
         return "<Shopcart id=[%s] customer_id=[$s] item_name =[%s]>" % (self.id, self.customer_id, self.item_name)
@@ -61,6 +63,7 @@ class Shopcart(db.Model):
         return {
             "id": self.id,
             "customer_id":self.customer_id,
+            "item_sku":self.item_sku,
             "item_name":self.item_name,
             "item_quantity":self.item_quantity,
             "item_price":self.item_price
@@ -76,6 +79,7 @@ class Shopcart(db.Model):
         try:
             self.id = data["id"]
             self.customer_id = data["customer_id"]
+            self.item_sku = data["item_sku"]
             self.item_name = data["item_name"]
             self.item_quantity = data["item_quantity"]
             self.item_price = data["item_price"]
