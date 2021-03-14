@@ -131,3 +131,13 @@ class Shopcart(db.Model):
         """
         logger.info("Processing name query for %s ...", item_name)
         return cls.query.filter(cls.item_name == item_name)
+
+    @classmethod
+    def find_by_sku(cls, item_sku):
+        """Returns all Shopcarts that has a specific item
+
+        Args:
+            name (string): the name of an item in a Shopcart you want to match
+        """
+        logger.info("Processing name query for %s ...", item_sku)
+        return cls.query.filter(cls.item_sku == item_sku)
