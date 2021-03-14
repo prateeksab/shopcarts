@@ -1,12 +1,31 @@
+# Copyright 2016, 2019 John J. Rofrano. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 """
 Test cases for Shopcart Model
-
+Test cases can be run with:
+    nosetests
+    coverage report -m
+While debugging just these tests it's convinient to use this:
+    nosetests --stop tests/test_models.py:TestShopcart
 """
 import logging
 import unittest
 import os
 from service.models import Shopcart, DataValidationError, db
 from service import app
+from .factories import ShopcartFactory
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgres://postgres:postgres@localhost:5432/postgres"
@@ -53,22 +72,28 @@ class TestShopcart(unittest.TestCase):
 
     def test_create_shopcart(self):
         """ Create a ShopCart -- Asserts that it exists """
-        fake_shopcart = ShopCartFactory()
-        shopcart = ShopCart(
-            customer_id = fake_shopcart.customer_id
-        )
+        fake_shopcart = ShopcartFactory()
+        shopcart = Shopcart()
+            #customer_id = fake_shopcart.customer_id
         self.assertTrue(shopcart != None)
         self.assertEqual(shopcart.id, None)
-        self.assertEqual(shopcart.customer_id, fake_shopcart.customer_id)
+
+        self.assertTrue(fake_shopcart != None)
+        self.assertEqual(fake_shopcart.id, 0)
+        self.assertEqual(fake_shopcart.customer_id, 0)
+        self.assertEqual(fake_shopcart.item_sku, 0)
+        self.assertEqual(fake_shopcart.item_name, "item_dog")
+
+        #self.assertEqual(shopcart.customer_id, fake_shopcart.customer_id)
 
 
-    def test_add_shopcart(self):
-        """ Create a ShopCart -- Add it to the database """
-        shopcarts = ShopCart.all()
+    def test_add_item_to_shopcart(self):
+        """ Add items to a shopcart, check that the items get added to database """
+        shopcarts = Shopcart.all()
+        shopcart = Shopcart(id=1,customer_id=1,item_sku=1,item_name="First Item", item_quantity=10,item_price=15)
         self.assertEqual(shopcarts, [])
-        shopcart = self._create_shopcart()
         shopcart.create()
         # Assert that it was assigned an id and shows up in the database
         self.assertEqual(shopcart.id, 1)
-        shopcarts = ShopCart.all()
+        shopcarts = Shopcart.all()
         self.assertEqual(len(shopcarts), 1)
