@@ -7,11 +7,13 @@ Test cases can be run with the following:
 """
 import os
 import logging
+import unittest
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 from flask_api import status  # HTTP Status Codes
 from service.models import db
 from service.routes import app, init_db
+import tests.factories
 
 # DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')
 DATABASE_URI = os.getenv(
@@ -57,6 +59,22 @@ class TestItemServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         # data = resp.get_json()
         # self.assertEqual(data["name"], "Item REST API Service")
+
+    def _create_items(self, count):
+        """ Factory method to create pets in bulk """
+        items = []
+        for _ in range(count):
+            test_item = ItemFactory()
+            resp = self.app.post(
+                "/pets", json=test_pet.serialize(), content_type="application/json"
+            )
+            self.assertEqual(
+                resp.status_code, status.HTTP_201_CREATED, "Could not create test pet"
+            )
+            new_pet = resp.get_json()
+            test_pet.id = new_pet["id"]
+            pets.append(test_pet)
+        return pets
 
     def test_get_item_list(self):
         """ Get a list of Items """
