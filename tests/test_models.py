@@ -105,3 +105,18 @@ class TestShopcart(unittest.TestCase):
         self.assertTrue(shopcart != None)
         self.assertEqual(shopcart.id, fake_shopcart.id)
         self.assertEqual(shopcart.customer_id, fake_shopcart.customer_id)
+
+    def test_create_an_item(self):
+        """ Create an Item and assert that it exists """
+        fake_item = ItemFactory()
+        item = Item(
+            id=fake_item.id,
+            item_name=fake_item.item_name,
+            item_quantity=fake_item.item_quantity,
+            item_price=fake_item.item_price
+        )
+        self.assertTrue(item != None)
+        self.assertEqual(item.id, fake_item.id)
+        self.assertEqual(item.item_name, fake_item.item_name)
+        self.assertEqual(item.item_quantity, fake_item.item_quantity)
+        self.assertEqual(item.item_price, fake_item.item_price)
