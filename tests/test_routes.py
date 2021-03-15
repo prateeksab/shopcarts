@@ -68,7 +68,7 @@ class TestYourResourceServer(TestCase):
         test_cart = ShopcartFactory()
         logging.debug(test_cart)
         resp = self.app.post(
-            "/shopcarts", json=test_cart.serialize(), content_type="application/json"
+            "/shopcart", json=test_cart.serialize(), content_type="application/json"
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         # Make sure location header is set
@@ -76,7 +76,7 @@ class TestYourResourceServer(TestCase):
         self.assertIsNotNone(location)
         # Check the data is correct
         new_cart = resp.get_json()
-        #self.assertEqual(new_cart["id"], test_cart.id, "IDs do not match")
+        self.assertEqual(new_cart["id"], test_cart.id, "IDs do not match")
         self.assertEqual(
             new_cart["customer_id"], test_cart.customer_id, "Customer IDs do not match"
         )
@@ -96,7 +96,7 @@ class TestYourResourceServer(TestCase):
         resp = self.app.get(location, content_type="application/json")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_cart = resp.get_json()
-       #self.assertEqual(new_cart["id"], test_cart.id, "IDs do not match")
+        self.assertEqual(new_cart["id"], test_cart.id, "IDs do not match")
         self.assertEqual(
             new_cart["customer_id"], test_cart.customer_id, "Customer IDs do not match"
         )
