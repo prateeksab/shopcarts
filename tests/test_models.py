@@ -74,8 +74,8 @@ class TestShopcart(unittest.TestCase):
         """ Create a ShopCart -- Asserts that it exists, Entries match a fake shopcart """
         fake_shopcart = ShopcartFactory()
         self.assertTrue(fake_shopcart != None)
-        id = fake_shopcart.id
-        self.assertEqual(fake_shopcart.id, id)
+        #id = fake_shopcart.id
+        #self.assertEqual(fake_shopcart.id, id)
         customer_id = fake_shopcart.customer_id
         self.assertEqual(fake_shopcart.customer_id, customer_id)
         item_sku = fake_shopcart.item_sku

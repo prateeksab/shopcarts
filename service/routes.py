@@ -25,9 +25,15 @@ from . import app
 def index():
     """ Root URL response """
     return (
-        "Reminder: return some useful information in json format about the service here",
+        jsonify(
+            name="Shopcart REST API Service",
+            version="1.0",
+            
+        ),
         status.HTTP_200_OK,
     )
+
+
 
 
 ######################################################################
@@ -40,6 +46,23 @@ def init_db():
     global app
     Shopcart.init_db(app)
 
+
+######################################################################
+# RETRIEVE A SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:pet_id>", methods=["GET"])
+def get_shopcarts(id):
+    """
+    Retrieve a single shopcart
+    This endpoint will return a shopcart based on it's id
+    """
+    app.logger.info("Request for shopcart with id: %s", id)
+    shopcart = Shopcart.find(id)
+    if not shopcart:
+        raise NotFound("Pet with id '{}' was not found.".format(id))
+    return make_response(jsonify(shopcart.serialize()), status.HTTP_200_OK)
+
+
 ######################################################################
 # ADD A NEW SHOP CART
 ######################################################################
@@ -50,7 +73,7 @@ def create_shopcarts():
     This endpoint will create a shopcart based the data in the body that is posted
     """
     app.logger.info("Request to create a shopcart")
-    check_content_type("application/json")
+    #check_content_type("application/json")
     shopcart = Shopcart()
     shopcart.deserialize(request.get_json())
     shopcart.create()

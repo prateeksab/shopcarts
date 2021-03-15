@@ -34,7 +34,7 @@ class Shopcart(db.Model):
 
 
     def __repr__(self):
-        return "<Shopcart id=[%s] customer_id=[$s] item_name =[%s]>" % (self.id, self.customer_id, self.item_name)
+        return "<Shopcart id=[%s] customer_id=[%s] item_name =[%s]>" % (self.id, self.customer_id, self.item_name)
 
     def create(self):
         """

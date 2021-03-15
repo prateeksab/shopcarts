@@ -25,7 +25,7 @@ class ShopcartFactory(factory.Factory):
     class Meta:
         model = Shopcart
 
-    id = factory.Sequence(lambda n: n)
+    id = factory.Sequence(lambda n: n+2)
     customer_id = factory.Sequence(lambda n: n)
     item_sku = factory.Sequence(lambda n: n)
     item_name = FuzzyChoice(choices=["item_dog", "item_cat", "item_bird", "item_fish"])
