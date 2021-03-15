@@ -28,11 +28,8 @@ class ShopcartFactory(factory.Factory):
     id = factory.Sequence(lambda n: n)
     customer_id = factory.Sequence(lambda n: n)
     item_sku = factory.Sequence(lambda n: n)
-    #item_name = FuzzyChoice(choices=["item_dog", "item_cat", "item_bird", "item_fish"])
-    item_name = "item_dog"
+    item_name = FuzzyChoice(choices=["item_dog", "item_cat", "item_bird", "item_fish"])
     item_quantity = factory.Sequence(lambda n: n)
-    item_quantity = factory.Sequence(lambda n: n)
+    item_price = FuzzyChoice(choices=[10.0,15.6,17.1,199999.1222])
     
-class ItemFactory(factory.Factory):
-    pass
-
+ 

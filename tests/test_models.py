@@ -71,29 +71,18 @@ class TestShopcart(unittest.TestCase):
 
 
     def test_create_shopcart(self):
-        """ Create a ShopCart -- Asserts that it exists """
+        """ Create a ShopCart -- Asserts that it exists, Entries match a fake shopcart """
         fake_shopcart = ShopcartFactory()
-        shopcart = Shopcart()
-            #customer_id = fake_shopcart.customer_id
-        self.assertTrue(shopcart != None)
-        self.assertEqual(shopcart.id, None)
-
         self.assertTrue(fake_shopcart != None)
-        self.assertEqual(fake_shopcart.id, 0)
-        self.assertEqual(fake_shopcart.customer_id, 0)
-        self.assertEqual(fake_shopcart.item_sku, 0)
-        self.assertEqual(fake_shopcart.item_name, "item_dog")
+        id = fake_shopcart.id
+        self.assertEqual(fake_shopcart.id, id)
+        customer_id = fake_shopcart.customer_id
+        self.assertEqual(fake_shopcart.customer_id, customer_id)
+        item_sku = fake_shopcart.item_sku
+        self.assertEqual(fake_shopcart.item_sku, item_sku)
+        item_name = fake_shopcart.item_name
+        self.assertEqual(fake_shopcart.item_name, item_name)
+        item_price = fake_shopcart.item_price
+        self.assertEqual(fake_shopcart.item_price, item_price)
 
-        #self.assertEqual(shopcart.customer_id, fake_shopcart.customer_id)
-
-
-    def test_add_item_to_shopcart(self):
-        """ Add items to a shopcart, check that the items get added to database """
-        shopcarts = Shopcart.all()
-        shopcart = Shopcart(id=1,customer_id=1,item_sku=1,item_name="First Item", item_quantity=10,item_price=15)
-        self.assertEqual(shopcarts, [])
-        shopcart.create()
-        # Assert that it was assigned an id and shows up in the database
-        self.assertEqual(shopcart.id, 1)
-        shopcarts = Shopcart.all()
-        self.assertEqual(len(shopcarts), 1)
+        

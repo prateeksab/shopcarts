@@ -40,6 +40,26 @@ def init_db():
     global app
     Shopcart.init_db(app)
 
+######################################################################
+# ADD A NEW SHOP CART
+######################################################################
+@app.route("/shopcarts", methods=["POST"])
+def create_shopcarts():
+    """
+    Creates a shopcart
+    This endpoint will create a shopcart based the data in the body that is posted
+    """
+    app.logger.info("Request to create a shopcart")
+    check_content_type("application/json")
+    shopcart = Shopcart()
+    shopcart.deserialize(request.get_json())
+    shopcart.create()
+    message = shopcart.serialize()
+    location_url = url_for("get_shopcarts", id=shopcart.id, _external=True)
+    return make_response(
+        jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
+    )
+
 
 @app.route('/shopcarts/<int:shopcart_id>/items', methods=['POST'])
 def create_items(shopcart_id):
@@ -50,7 +70,7 @@ def create_items(shopcart_id):
     app.logger.info("Request to add an item to a shopcart")
     check_content_type("application/json")
     shopcart = Shopcart.find_or_404(shopcart_id)
-    item = CartItem()
+    #item = CartItem()
     item.deserialize(request.get_json())
     shopcart.items.append(item)
     shopcart.save()
