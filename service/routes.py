@@ -9,17 +9,15 @@ import sys
 import logging
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from flask_api import status  # HTTP Status Codes
-
-
+from werkzeug.exceptions import NotFound
 
 # For this example we'll use SQLAlchemy, a popular ORM that supports a
 # variety of backends including SQLite, MySQL, and PostgreSQL
 from flask_sqlalchemy import SQLAlchemy
-from service.models import Shopcart, DataValidationError
+from service.models import Shopcart, Item, DataValidationError
 
 # Import Flask application
 from . import app
-from werkzeug.exceptions import NotFound
 
 ######################################################################
 # Error Handlers
@@ -109,29 +107,33 @@ def index():
         jsonify(
             name="Shopcart REST API Service",
             version="1.0",
-            
+            paths=url_for("list_shopcarts", _external=True),
         ),
-        status.HTTP_200_OK,
+        status.HTTP_200_OK
     )
 
 
-
-
 ######################################################################
-#  U T I L I T Y   F U N C T I O N S
+# LIST ALL ACCOUNTS
 ######################################################################
+@app.route("/shopcarts", methods=["GET"])
+def list_shopcarts():
+    """ Returns all of the Shopcart """
+    app.logger.info("Request for Shopcart list")
+    shopcarts = []
+    shopcart_id = request.args.get("id")
+    if shopcart_id:
+        shopcarts = Shopcart.find_by_id(shopcart_id)
+    else:
+        shopcarts = Shopcart.all()
 
-
-def init_db():
-    """ Initialies the SQLAlchemy app """
-    global app
-    Shopcart.init_db(app)
-
+    results = [shopcart.serialize() for shopcart in shopcarts]
+    return make_response(jsonify(results), status.HTTP_200_OK)
 
 ######################################################################
 # RETRIEVE A SHOPCART
 ######################################################################
-@app.route("/shopcarts/<int:pet_id>", methods=["GET"])
+@app.route("/shopcarts/<int:id>", methods=["GET"])
 def get_shopcarts(id):
     """
     Retrieve a single shopcart
@@ -140,14 +142,14 @@ def get_shopcarts(id):
     app.logger.info("Request for shopcart with id: %s", id)
     shopcart = Shopcart.find(id)
     if not shopcart:
-        raise NotFound("Pet with id '{}' was not found.".format(id))
+        raise NotFound("Shopcart with id '{}' was not found.".format(id))
     return make_response(jsonify(shopcart.serialize()), status.HTTP_200_OK)
 
 
 ######################################################################
 # ADD A NEW SHOP CART
 ######################################################################
-@app.route("/shopcart", methods=["POST"])
+@app.route("/shopcarts", methods=["POST"])
 def create_shopcarts():
     """
     Creates a shopcart
@@ -164,7 +166,6 @@ def create_shopcarts():
         jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
     )
 
-
 # @app.route('/shopcarts/<int:shopcart_id>/items', methods=['POST'])
 # def create_items(shopcart_id):
 #     """
@@ -180,3 +181,19 @@ def create_shopcarts():
 #     shopcart.save()
 #     message = item.serialize()
 #     return make_response(jsonify(message), status.HTTP_201_CREATED)
+
+######################################################################
+#  U T I L I T Y   F U N C T I O N S
+######################################################################
+
+def init_db():
+    """ Initialies the SQLAlchemy app """
+    global app
+    Shopcart.init_db(app)
+
+def check_content_type(content_type):
+    """ Checks that the media type is correct """
+    if request.headers["Content-Type"] == content_type:
+        return
+    app.logger.error("Invalid Content-Type: %s", request.headers["Content-Type"])
+    abort(415, "Content-Type must be {}".format(content_type))
