@@ -108,24 +108,29 @@ def index():
         status.HTTP_200_OK,
     )
 
-######################################################################
-# LIST ALL ITEMS
-######################################################################
-@app.route("/items", methods=["GET"])
-def list_items():
-    """ Returns all of the Items """
-    app.logger.info("Request for Item list")
-    items = []
-    sku = request.args.get("item_sku")
-    name = request.args.get("item_name")
-    if sku:
-        items = Shopcart.find_by_sku(sku)
-    elif name:
-        items = Shopcart.find_by_name(name)
-    else:
-        items = Shopcart.all()
 
-    results = [item.serialize() for item in items]
+######################################################################
+# RETRIEVE A SHOPCART
+######################################################################
+@app.route("/shopcart/<int:shopcart_id>", methods=["GET"])
+def get_shopcart(shopcart_id):
+    """
+    Retrieve a single Shopcart
+    This endpoint will return a Shopcart based on it's id
+    """
+    app.logger.info("Request for shopcart with id: %s", shopcart_id)
+    Shopcart = Shopcart.find_or_404(shopcart_id)
+    return make_response(jsonify(Shopcart.serialize()), status.HTTP_200_OK)
+
+######################################################################
+# LIST ITEMS
+######################################################################
+@app.route("/shopcart/<int:shopcart_id>/items", methods=["GET"])
+def list_items(shopcart_id):
+    """ Returns all of the Items for a Shopcart """
+    app.logger.info("Request for Shopcart Items...")
+    Shopcart = Shopcart.find_or_404(shopcart_id)
+    results = [item.serialize() for item in shopcart.items]
     return make_response(jsonify(results), status.HTTP_200_OK)
 
 ######################################################################
