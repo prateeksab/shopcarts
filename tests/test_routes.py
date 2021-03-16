@@ -99,62 +99,28 @@ class TestShopcartServer(unittest.TestCase):
         
         # Check the data is correct
         new_shopcart = resp.get_json()
-        self.assertEqual(new_shopcart["id"], shopcart.id, "ID does not match")
         self.assertEqual(new_shopcart["customer_id"], shopcart.customer_id, "CUSTOMER_ID does not match")
 
         # Check that the location header was correct by getting it
         resp = self.app.get(location, content_type="application/json")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_shopcart = resp.get_json()
-        self.assertEqual(new_shopcart["id"], shopcart.id, "ID does not match")
         self.assertEqual(new_shopcart["customer_id"], shopcart.customer_id, "CUSTOMER_ID does not match")
 
-    # def test_create_shopcart(self):
-    #     """ Create a new shopcart """
-    #     test_shopcart = ShopcartFactory()
-    #     logging.debug(test_shopcart)
-    #     resp = self.app.post(
-    #         BASE_URL, json=test_shopcart.serialize(), content_type=CONTENT_TYPE_JSON
-    #     )
-    #     self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-    #     # Make sure location header is set
-    #     location = resp.headers.get("Location", None)
-    #     self.assertIsNotNone(location)
-    #     # Check the data is correct
-    #     new_shopcart = resp.get_json()
-    #     self.assertEqual(new_shopcart["id"], test_shopcart.id, "IDs do not match")
-    #     self.assertEqual(
-    #         new_shopcart["customer_id"], test_shopcart.customer_id, "Customer IDs do not match"
-    #     )
-    #     self.assertEqual(
-    #         new_shopcart["item_sku"], test_shopcart.item_sku, "Item SKU does not match"
-    #     )
-    #     self.assertEqual(
-    #         new_shopcart["item_name"], test_shopcart.item_name, "Item names do not match"
-    #     )
-    #     self.assertEqual(
-    #         new_shopcart["item_quantity"], test_shopcart.item_quantity, "Item quantity does not match"
-    #     )
-    #     self.assertEqual(
-    #         new_shopcart["item_price"], test_shopcart.item_price, "Item Price does not match"
-    #     )
-    #     # Check that the location header was correct
-    #     resp = self.app.get(location, content_type=CONTENT_TYPE_JSON)
-    #     self.assertEqual(resp.status_code, status.HTTP_200_OK)
-    #     new_shopcart = resp.get_json()
-    #     self.assertEqual(new_shopcart["id"], test_shopcart.id, "IDs do not match")
-    #     self.assertEqual(
-    #         new_shopcart["customer_id"], test_shopcart.customer_id, "Customer IDs do not match"
-    #     )
-    #     self.assertEqual(
-    #         new_shopcart["item_sku"], test_shopcart.item_sku, "Item SKU does not match"
-    #     )
-    #     self.assertEqual(
-    #         new_shopcart["item_name"], test_shopcart.item_name, "Item names do not match"
-    #     )
-    #     self.assertEqual(
-    #         new_shopcart["item_quantity"], test_shopcart.item_quantity, "Item quantity does not match"
-    #     )
-    #     self.assertEqual(
-    #         new_shopcart["item_price"], test_shopcart.item_price, "Item Price does not match"
-    #     )
+    def test_add_item(self):
+        """ Add an item to a shopcart """
+        shopcart = self._create_shopcarts(1)[0]
+        item = ItemFactory()
+        resp = self.app.post(
+            "/shopcarts/{}/items".format(shopcart.id), 
+            json=item.serialize(), 
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        data = resp.get_json()
+        logging.debug(data)
+        self.assertEqual(data["shopcart_id"], shopcart.id)
+        self.assertEqual(data["id"], item.id)
+        self.assertEqual(data["item_name"], item.item_name)
+        self.assertEqual(data["item_quantity"], item.item_quantity)
+        self.assertEqual(data["item_price"], item.item_price)
