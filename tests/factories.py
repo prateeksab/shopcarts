@@ -21,5 +21,4 @@ class ShopcartFactory(factory.Factory):
     class Meta:
         model = Shopcart
 
-    id = factory.Sequence(lambda n: n)
     customer_id = random.randint(1,99999)

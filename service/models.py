@@ -92,10 +92,10 @@ class Item(db.Model, PersistentBase):
         """ Serializes a Shopcart into a dictionary """
         return {
             "id": self.id,
-            "customer_id":self.customer_id,
             "item_name":self.item_name,
             "item_quantity":self.item_quantity,
-            "item_price":self.item_price
+            "item_price":self.item_price,
+            "shopcart_id":self.shopcart_id
         }
 
     def deserialize(self, data):
@@ -107,10 +107,10 @@ class Item(db.Model, PersistentBase):
         """
         try:
             self.id = data["id"]
-            self.customer_id = data["customer_id"]
             self.item_name = data["item_name"]
             self.item_quantity = data["item_quantity"]
             self.item_price = data["item_price"]
+            self.shopcart_id = data["shopcart_id"]
 
         except KeyError as error:
             raise DataValidationError(
