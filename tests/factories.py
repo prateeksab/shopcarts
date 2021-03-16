@@ -1,33 +1,24 @@
-# Copyright 2016, 2019 John J. Rofrano. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-"""
-Test Factory to make fake objects for testing
-"""
+# Test Factory
 import factory
+import random
 from factory.fuzzy import FuzzyChoice
-from service.models import Shopcart
-
+from service.models import Shopcart, Item
 
 class ItemFactory(factory.Factory):
-    """ Creates fake pets that you don't have to feed """
+    """ Creates fake items  """
 
     class Meta:
         model = Item
 
     id = factory.Sequence(lambda n: n)
-    name = factory.Faker("first_name")
-    category = FuzzyChoice(choices=["dog", "cat", "bird", "fish"])
-    available = FuzzyChoice(choices=[True, False])
-    #gender = FuzzyChoice(choices=[Gender.Male, Gender.Female, Gender.Unknown])
+    item_name = FuzzyChoice(choices=["item_dog", "item_cat", "item_b", "item_fish","large_cat_food_is_long_word_test"])
+    item_quantity = random.randint(1,11)
+    item_price = FuzzyChoice(choices=[10.0,15.46,17.51,199999.2,66,2183])
+
+class ShopcartFactory(factory.Factory):
+    """ Creates fake Shopcarts """
+
+    class Meta:
+        model = Shopcart
+
+    customer_id = random.randint(1,99999)

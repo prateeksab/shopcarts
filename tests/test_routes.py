@@ -8,73 +8,122 @@ Test cases can be run with the following:
 import os
 import logging
 import unittest
-from unittest import TestCase
-from unittest.mock import MagicMock, patch
 from flask_api import status  # HTTP Status Codes
+from tests.factories import ShopcartFactory, ItemFactory
 from service.models import db
 from service.routes import app, init_db
-import tests.factories
 
 # DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgres://postgres:postgres@localhost:5432/postgres"
 )
 
+BASE_URL = '/shopcarts'
+CONTENT_TYPE_JSON = "application/json"
+
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
-class TestItemServer(unittest.TestCase):
-    """ Item Server Tests """
+class TestShopcartServer(unittest.TestCase):
+    """ Shopcart Server Tests """
 
     @classmethod
     def setUpClass(cls):
-        """ Run once before all tests """
-        app.config["TESTING"] = True
-        app.config["DEBUG"] = False
+        """ This runs once before the entire test suite """
+        app.debug = False
+        app.testing = True
+        # Set up the test database
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
-        app.logger.setLevel(logging.CRITICAL)
         init_db()
 
     @classmethod
     def tearDownClass(cls):
-        pass
+        """ This runs once after the entire test suite """
+        db.session.close()
 
     def setUp(self):
-        """ Runs before each test """
+        """ This runs before each test """
         db.drop_all()  # clean up the last tests
         db.create_all()  # create new tables
         self.app = app.test_client()
 
     def tearDown(self):
+        """ This runs after each test """
         db.session.remove()
         db.drop_all()
 
-    ######################################################################
-    #  P L A C E   T E S T   C A S E S   H E R E
-    ######################################################################
+######################################################################
+#  H E L P E R   M E T H O D S
+######################################################################
 
-    def test_index(self):
-        """ Test the Home Page """
-        resp = self.app.get("/")
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        # data = resp.get_json()
-        # self.assertEqual(data["name"], "Item REST API Service")
-
-    def _create_items(self, count):
-        """ Factory method to create pets in bulk """
-        items = []
+    def _create_shopcarts(self, count):
+        """ Factory method to create shopcarts in bulk """
+        shopcarts = []
         for _ in range(count):
-            test_item = ItemFactory()
+            shopcart = ShopcartFactory()
             resp = self.app.post(
-                "/pets", json=test_pet.serialize(), content_type="application/json"
+                BASE_URL, json=shopcart.serialize(), content_type=CONTENT_TYPE_JSON
             )
             self.assertEqual(
-                resp.status_code, status.HTTP_201_CREATED, "Could not create test pet"
+                resp.status_code, status.HTTP_201_CREATED, "Could not create test Shopcart"
             )
-            new_pet = resp.get_json()
-            test_pet.id = new_pet["id"]
-            pets.append(test_pet)
-        return pets
+            new_shopcart = resp.get_json()
+            shopcart.id = new_shopcart["id"]
+            shopcarts.append(shopcart)
+        return shopcarts
+
+######################################################################
+#  P L A C E   T E S T   C A S E S   H E R E
+######################################################################
+
+    def test_index(self):
+        """ Test index call """
+        resp = self.app.get("/")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data["name"], "Shopcart REST API Service")
+    
+    def test_create_shopcart(self):
+        """ Create a new Shopcart """
+        shopcart = ShopcartFactory()
+        resp = self.app.post(
+            BASE_URL, 
+            json=shopcart.serialize(), 
+            content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        
+        # Make sure location header is set
+        location = resp.headers.get("Location", None)
+        self.assertIsNotNone(location)
+        
+        # Check the data is correct
+        new_shopcart = resp.get_json()
+        self.assertEqual(new_shopcart["customer_id"], shopcart.customer_id, "CUSTOMER_ID does not match")
+
+        # Check that the location header was correct by getting it
+        resp = self.app.get(location, content_type="application/json")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        new_shopcart = resp.get_json()
+        self.assertEqual(new_shopcart["customer_id"], shopcart.customer_id, "CUSTOMER_ID does not match")
+
+    def test_add_item(self):
+        """ Add an item to a shopcart """
+        shopcart = self._create_shopcarts(1)[0]
+        item = ItemFactory()
+        resp = self.app.post(
+            "/shopcarts/{}/items".format(shopcart.id), 
+            json=item.serialize(), 
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        data = resp.get_json()
+        logging.debug(data)
+        self.assertEqual(data["shopcart_id"], shopcart.id)
+        self.assertEqual(data["id"], item.id)
+        self.assertEqual(data["item_name"], item.item_name)
+        self.assertEqual(data["item_quantity"], item.item_quantity)
+        self.assertEqual(data["item_price"], item.item_price)
 
     def test_get_item_list(self):
         """ Get a list of Items """
@@ -84,11 +133,10 @@ class TestItemServer(unittest.TestCase):
         data = resp.get_json()
         self.assertEqual(len(data), 5)
 
-
     def test_get_shopcart_list(self):
         """ Get a list of shopcarts """
-        self._create_shopcart(5)
-        resp = self.app.get("/shopcart")
+        self._create_shopcarts(5)
+        resp = self.app.get("/shopcarts")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         self.assertEqual(len(data), 5)        
@@ -96,9 +144,9 @@ class TestItemServer(unittest.TestCase):
     def test_get_shopcart(self):
         """ Get a single_test_get_shopcart """
         # get the id of an shopcart
-        shopcart = self._create_shopcart(1)[0]
+        shopcart = self._create_shopcarts(1)[0]
         resp = self.app.get(
-            "/shopcart/{}".format(shopcart.id), 
+            "/shopcarts/{}".format(shopcart.id), 
             content_type="application/json"
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -108,10 +156,10 @@ class TestItemServer(unittest.TestCase):
     def test_get_item_list(self):
         """ Get an item from a shopcart """
         # create a known item
-        shopcart = self._create_shopcart(1)[0]
+        shopcart = self._create_shopcarts(1)[0]
         item = ItemFactory()
         resp = self.app.post(
-            "/shopcart/{}/items".format(shopcart.id), 
+            "/shopcarts/{}/items".format(shopcart.id), 
             json=item.serialize(), 
             content_type="application/json"
         )
@@ -123,12 +171,10 @@ class TestItemServer(unittest.TestCase):
 
         # retrieve it back
         resp = self.app.get(
-            "/shopcart/{}/items/{}".format(shopcart.id, item_id), 
+            "/shopcarts/{}/items".format(shopcart.id), 
             content_type="application/json" 
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
         data = resp.get_json()
         logging.debug(data)
-        self.assertEqual(data["shopcart_id"], shopcart.id)
-        self.assertEqual(data["customer_id"], shopcart.customer_id)

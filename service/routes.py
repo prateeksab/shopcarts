@@ -9,15 +9,15 @@ import sys
 import logging
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from flask_api import status  # HTTP Status Codes
+from werkzeug.exceptions import NotFound
 
 # For this example we'll use SQLAlchemy, a popular ORM that supports a
 # variety of backends including SQLite, MySQL, and PostgreSQL
 from flask_sqlalchemy import SQLAlchemy
-from service.models import Shopcart, DataValidationError
+from service.models import Shopcart, Item, DataValidationError
 
 # Import Flask application
 from . import app
-
 
 ######################################################################
 # Error Handlers
@@ -104,15 +104,91 @@ def internal_server_error(error):
 def index():
     """ Root URL response """
     return (
-        "Reminder: return some useful information in json format about the service here",
-        status.HTTP_200_OK,
+        jsonify(
+            name="Shopcart REST API Service",
+            version="1.0",
+            paths=url_for("list_shopcarts", _external=True),
+        ),
+        status.HTTP_200_OK
     )
 
 
 ######################################################################
+# LIST ALL ACCOUNTS
+######################################################################
+@app.route("/shopcarts", methods=["GET"])
+def list_shopcarts():
+    """ Returns all of the Shopcart """
+    app.logger.info("Request for Shopcart list")
+    shopcarts = []
+    shopcart_id = request.args.get("id")
+    if shopcart_id:
+        shopcarts = Shopcart.find_by_id(shopcart_id)
+    else:
+        shopcarts = Shopcart.all()
+
+    results = [shopcart.serialize() for shopcart in shopcarts]
+    return make_response(jsonify(results), status.HTTP_200_OK)
+
+######################################################################
 # RETRIEVE A SHOPCART
 ######################################################################
-@app.route("/shopcart/<int:shopcart_id>", methods=["GET"])
+@app.route("/shopcarts/<int:id>", methods=["GET"])
+def get_shopcarts(id):
+    """
+    Retrieve a single shopcart
+    This endpoint will return a shopcart based on it's id
+    """
+    app.logger.info("Request for shopcart with id: %s", id)
+    shopcart = Shopcart.find(id)
+    if not shopcart:
+        raise NotFound("Shopcart with id '{}' was not found.".format(id))
+    return make_response(jsonify(shopcart.serialize()), status.HTTP_200_OK)
+
+
+######################################################################
+# ADD A NEW SHOP CART
+######################################################################
+@app.route("/shopcarts", methods=["POST"])
+def create_shopcarts():
+    """
+    Creates a shopcart
+    This endpoint will create a shopcart based the data in the body that is posted
+    """
+    app.logger.info("Request to create a shopcart")
+    #check_content_type("application/json")
+    shopcart = Shopcart()
+    shopcart.deserialize(request.get_json())
+    shopcart.create()
+    message = shopcart.serialize()
+    location_url = url_for("get_shopcarts", id=shopcart.id, _external=True)
+    return make_response(
+        jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
+    )
+
+######################################################################
+# ADD AN ITEM TO A SHOPCART
+######################################################################
+@app.route('/shopcarts/<int:shopcart_id>/items', methods=['POST'])
+def create_items(shopcart_id):
+    """
+    Create an Item in an Shopcart
+    This endpoint will add an item to a shopcart
+    """
+    app.logger.info("Request to add an item to a shopcart")
+    check_content_type("application/json")
+    shopcart = Shopcart.find_or_404(shopcart_id)
+    item = Item()
+    item.deserialize(request.get_json())
+    shopcart.items_list.append(item)
+    shopcart.save()
+    message = item.serialize()
+    return make_response(jsonify(message), status.HTTP_201_CREATED)
+
+######################################################################
+# RETRIEVE A SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>", methods=["GET"])
 def get_shopcart(shopcart_id):
     """
     Retrieve a single Shopcart
@@ -125,20 +201,26 @@ def get_shopcart(shopcart_id):
 ######################################################################
 # LIST ITEMS
 ######################################################################
-@app.route("/shopcart/<int:shopcart_id>/items", methods=["GET"])
+@app.route("/shopcarts/<int:shopcart_id>/items", methods=["GET"])
 def list_items(shopcart_id):
     """ Returns all of the Items for a Shopcart """
     app.logger.info("Request for Shopcart Items...")
-    Shopcart = Shopcart.find_or_404(shopcart_id)
-    results = [item.serialize() for item in shopcart.items]
+    shopcart = Shopcart.find_or_404(shopcart_id)
+    results = [item.serialize() for item in shopcart.items_list]
     return make_response(jsonify(results), status.HTTP_200_OK)
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 
-
 def init_db():
     """ Initialies the SQLAlchemy app """
     global app
     Shopcart.init_db(app)
+
+def check_content_type(content_type):
+    """ Checks that the media type is correct """
+    if request.headers["Content-Type"] == content_type:
+        return
+    app.logger.error("Invalid Content-Type: %s", request.headers["Content-Type"])
+    abort(415, "Content-Type must be {}".format(content_type))
