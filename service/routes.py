@@ -186,7 +186,7 @@ def create_items(shopcart_id):
     return make_response(jsonify(message), status.HTTP_201_CREATED)
 
 ######################################################################
-# RETRIEVE AN ADDRESS FROM SHOPCART
+# RETRIEVE AN ITEM FROM SHOPCART
 ######################################################################
 @app.route('/shopcarts/<int:shopcart_id>/items/<int:item_id>', methods=['GET'])
 def get_items(shopcart_id, item_id):
@@ -235,6 +235,28 @@ def delete_item(shopcart_id, item_id):
 
 
 
+# RETRIEVE A SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>", methods=["GET"])
+def get_shopcart(shopcart_id):
+    """
+    Retrieve a single Shopcart
+    This endpoint will return a Shopcart based on it's id
+    """
+    app.logger.info("Request for shopcart with id: %s", shopcart_id)
+    Shopcart = Shopcart.find_or_404(shopcart_id)
+    return make_response(jsonify(Shopcart.serialize()), status.HTTP_200_OK)
+
+######################################################################
+# LIST ITEMS
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>/items", methods=["GET"])
+def list_items(shopcart_id):
+    """ Returns all of the Items for a Shopcart """
+    app.logger.info("Request for Shopcart Items...")
+    shopcart = Shopcart.find_or_404(shopcart_id)
+    results = [item.serialize() for item in shopcart.items_list]
+    return make_response(jsonify(results), status.HTTP_200_OK)
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S

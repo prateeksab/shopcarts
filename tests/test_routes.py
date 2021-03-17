@@ -165,3 +165,57 @@ class TestShopcartServer(unittest.TestCase):
             content_type="application/json"
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_item_list(self):
+        """ Get a list of Items """
+        self._create_items(5)
+        resp = self.app.get("/items")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), 5)
+
+    def test_get_shopcart_list(self):
+        """ Get a list of shopcarts """
+        self._create_shopcarts(5)
+        resp = self.app.get("/shopcarts")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), 5)        
+
+    def test_get_shopcart(self):
+        """ Get a single_test_get_shopcart """
+        # get the id of an shopcart
+        shopcart = self._create_shopcarts(1)[0]
+        resp = self.app.get(
+            "/shopcarts/{}".format(shopcart.id), 
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data["id"], shopcart.id)
+    
+    def test_get_item_list(self):
+        """ Get an item from a shopcart """
+        # create a known item
+        shopcart = self._create_shopcarts(1)[0]
+        item = ItemFactory()
+        resp = self.app.post(
+            "/shopcarts/{}/items".format(shopcart.id), 
+            json=item.serialize(), 
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        data = resp.get_json()
+        logging.debug(data)
+        shopcart_id = data["id"]
+
+        # retrieve it back
+        resp = self.app.get(
+            "/shopcarts/{}/items".format(shopcart.id), 
+            content_type="application/json" 
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        data = resp.get_json()
+        logging.debug(data)
