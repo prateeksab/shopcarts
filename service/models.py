@@ -106,7 +106,7 @@ class Item(db.Model, PersistentBase):
             data (dict): A dictionary containing the resource data
         """
         try:
-            self.id = data["id"]
+            # self.id = data["id"]
             self.item_name = data["item_name"]
             self.item_quantity = data["item_quantity"]
             self.item_price = data["item_price"]
@@ -152,7 +152,7 @@ class Shopcart(db.Model, PersistentBase):
             data (dict): A dictionary containing the resource data
         """
         try:
-            self.id = data["id"]
+            # self.id = data["id"]
             self.customer_id = data["customer_id"]
             # handle inner list of addresses
             self.items_list = data.get("items_list")

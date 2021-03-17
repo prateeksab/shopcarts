@@ -114,7 +114,7 @@ def index():
 
 
 ######################################################################
-# LIST ALL ACCOUNTS
+# LIST ALL SHOPCARTS
 ######################################################################
 @app.route("/shopcarts", methods=["GET"])
 def list_shopcarts():
@@ -184,6 +184,57 @@ def create_items(shopcart_id):
     shopcart.save()
     message = item.serialize()
     return make_response(jsonify(message), status.HTTP_201_CREATED)
+
+######################################################################
+# RETRIEVE AN ADDRESS FROM SHOPCART
+######################################################################
+@app.route('/shopcarts/<int:shopcart_id>/items/<int:item_id>', methods=['GET'])
+def get_items(shopcart_id, item_id):
+    """
+    Get an Item
+    This endpoint returns just an item
+    """
+    app.logger.info("Request to get an item with id: %s", item_id)
+    item = Item.find_or_404(item_id)
+    return make_response(jsonify(item.serialize()), status.HTTP_200_OK)
+
+
+######################################################################
+# DELETE A SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>", methods=["DELETE"])
+def delete_shopcart(shopcart_id):
+    """
+    Delete a Shopcart
+    This endpoint will delete an shopcart based the id specified in the path
+    """
+    app.logger.info("Request to delete shopcart with id: %s", shopcart_id)
+    shopcart = Shopcart.find(shopcart_id)
+    if shopcart:
+        shopcart.delete()
+    return make_response("", status.HTTP_204_NO_CONTENT)
+
+
+
+######################################################################
+# DELETE AN ITEM
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>/items/<int:item_id>", methods=["DELETE"])
+def delete_item(shopcart_id, item_id):
+    """
+    Delete an Item
+    This endpoint will delete an Item based the id specified in the path
+    """
+    app.logger.info("Request to delete item with id: %s", shopcart_id)
+    item = Item.find(item_id)
+    if item:
+        item.delete()
+    return make_response("", status.HTTP_204_NO_CONTENT)
+
+
+
+
+
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S

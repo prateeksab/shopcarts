@@ -120,7 +120,48 @@ class TestShopcartServer(unittest.TestCase):
         data = resp.get_json()
         logging.debug(data)
         self.assertEqual(data["shopcart_id"], shopcart.id)
-        self.assertEqual(data["id"], item.id)
+        self.assertIsNotNone(data["id"])
         self.assertEqual(data["item_name"], item.item_name)
         self.assertEqual(data["item_quantity"], item.item_quantity)
         self.assertEqual(data["item_price"], item.item_price)
+
+
+    def test_delete_shopcart(self):
+        """ Delete an Shopcart """
+        # get the id of an shopcart
+        shopcart = self._create_shopcarts(1)[0]
+        resp = self.app.delete(
+            "/shopcarts/{}".format(shopcart.id), 
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+
+
+
+    def test_delete_item(self):
+        """ Delete an Item """
+        shopcart = self._create_shopcarts(1)[0]
+        item = ItemFactory()
+        resp = self.app.post(
+            "/shopcarts/{}/items".format(shopcart.id), 
+            json=item.serialize(), 
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        data = resp.get_json()
+        logging.debug(data)
+        item_id = data["id"]
+
+        # send delete request
+        resp = self.app.delete(
+            "/shopcarts/{}/items/{}".format(shopcart.id, item_id),
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+
+        # retrieve it back and make sure shopcart is not there
+        resp = self.app.get(
+            "/shopcarts/{}/items/{}".format(shopcart.id, item_id), 
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)

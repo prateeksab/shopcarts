@@ -69,8 +69,8 @@ class TestShopcart(unittest.TestCase):
         """ Creates an Shopcart from a Factory """
         fake_shopcart = ShopcartFactory()
         shopcart = Shopcart(
-            id=fake_shopcart.id, 
-            customer_id=fake_shopcart.customer_id
+            customer_id=fake_shopcart.customer_id,
+            items_list=items
         )
         self.assertTrue(shopcart != None)
         return shopcart
@@ -79,7 +79,6 @@ class TestShopcart(unittest.TestCase):
         """ Creates fake items from factory """
         fake_item = ItemFactory()
         item = Item(
-            id=fake_item.id,
             item_name=fake_item.item_name,
             item_quantity=fake_item.item_quantity,
             item_price=fake_item.item_price,
@@ -120,3 +119,43 @@ class TestShopcart(unittest.TestCase):
         self.assertEqual(item.item_name, fake_item.item_name)
         self.assertEqual(item.item_quantity, fake_item.item_quantity)
         self.assertEqual(item.item_price, fake_item.item_price)
+
+
+    def test_delete_an_shopcart(self):
+        """ Delete an shopcart from the database """
+        shopcarts = Shopcart.all()
+        self.assertEqual(shopcarts, [])
+        shopcart = self._create_shopcart()
+        shopcart.create()
+        # Assert that it was assigned an id and shows up in the database
+        self.assertEqual(shopcart.id, 1)
+        shopcarts = Shopcart.all()
+        self.assertEqual(len(shopcarts), 1)
+        shopcart = shopcarts[0]
+        shopcart.delete()
+        shopcarts = Shopcart.all()
+        self.assertEqual(len(shopcarts), 0)
+    
+
+    def test_delete_shopcart_item(self):
+        """ Delete an shopcarts item """
+        shopcarts = Shopcart.all()
+        self.assertEqual(shopcarts, [])
+
+        item = self._create_item()
+        shopcart = self._create_shopcart(items=[item])
+        shopcart.create()
+        # Assert that it was assigned an id and shows up in the database
+        self.assertEqual(shopcart.id, 1)
+        shopcarts = Shopcart.all()
+        self.assertEqual(len(shopcarts), 1)
+
+        # Fetch it back
+        shopcarts = Shopcart.find(shopcart.id)
+        item = shopcart.items_list[0]
+        item.delete()
+        shopcart.save()
+
+        # Fetch it back again
+        shopcart = Shopcart.find(shopcart.id)
+        self.assertEqual(len(shopcart.items_list), 0)
