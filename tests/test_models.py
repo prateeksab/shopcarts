@@ -120,3 +120,23 @@ class TestShopcart(unittest.TestCase):
         self.assertEqual(item.item_name, fake_item.item_name)
         self.assertEqual(item.item_quantity, fake_item.item_quantity)
         self.assertEqual(item.item_price, fake_item.item_price)
+    
+    def test_deserialize_with_key_error(self):
+        """ Deserialize an Shopcart with a KeyError """
+        shopcart = Shopcart()
+        self.assertRaises(DataValidationError, shopcart.deserialize, {})
+
+    def test_deserialize_with_type_error(self):
+        """ Deserialize an Shopcart with a TypeError """
+        shopcart = Shopcart()
+        self.assertRaises(DataValidationError, shopcart.deserialize, [])
+
+    def test_deserialize_item_key_error(self):
+        """ Deserialize an item with a KeyError """
+        item = Item()
+        self.assertRaises(DataValidationError, item.deserialize, {})
+
+    def test_deserialize_item_type_error(self):
+        """ Deserialize an item with a TypeError """
+        item = Item()
+        self.assertRaises(DataValidationError, item.deserialize, [])
