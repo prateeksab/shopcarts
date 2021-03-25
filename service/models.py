@@ -121,6 +121,15 @@ class Item(db.Model, PersistentBase):
                 "Invalid Shopcart: body of request contained bad or no data"
             )
         return self
+    
+    @classmethod
+    def find_by_item_name(cls, item_name):
+        """ Returns all Shopcarts that have the given item_name
+        Args:
+            item_name (string): the item_name of the item in Shopcarts you want to match
+        """
+        logger.info("Processing name query for %s ...", item_name)
+        return cls.query.filter(cls.item_name == item_name)
 
 class Shopcart(db.Model, PersistentBase):
 
@@ -167,3 +176,12 @@ class Shopcart(db.Model, PersistentBase):
                 "Invalid Item: body of request contained" "bad or no data"
             )
         return self
+
+    @classmethod
+    def find_by_customer_id(cls, customer_id):
+        """ Returns all Accounts with the given customer_id
+        Args:
+            customer_id (int): the customer_id associated with the Shopcart you want to match
+        """
+        logger.info("Processing name query for %s ...", customer_id)
+        return cls.query.filter(cls.customer_id == customer_id)
