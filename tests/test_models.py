@@ -179,3 +179,54 @@ class TestShopcart(unittest.TestCase):
         """ Deserialize an item with a TypeError """
         item = Item()
         self.assertRaises(DataValidationError, item.deserialize, [])
+
+    def test_add_item_to_shopcart(self):
+        """ Create a shopcart with an item and add it to the database """
+        shopcarts = Shopcart.all()
+        self.assertEqual(shopcarts, [])
+        shopcart = self._create_shopcart()
+        item = self._create_item()
+        shopcart.items_list.append(item)
+        shopcart.create()
+
+        # Assert that it was assigned an id and shows up in the database
+        self.assertEqual(shopcart.id, 1)
+        shopcarts = Shopcart.all()
+        self.assertEqual(len(shopcarts), 1)
+
+        new_shopcart = Shopcart.find(shopcart.id)
+        self.assertEqual(shopcart.items_list[0].item_name, item.item_name)
+
+        item2 = self._create_item()
+        shopcart.items_list.append(item2)
+        shopcart.save()
+
+        new_shopcart = Shopcart.find(shopcart.id)
+        self.assertEqual(len(shopcart.items_list), 2)
+        self.assertEqual(shopcart.items_list[1].item_name, item2.item_name)
+
+    def test_find_by_customer_id(self):
+        """ Find by customer_id """
+        shopcart = self._create_shopcart()
+        shopcart.create()
+
+        # Fetch it back by name
+        same_shopcart = Shopcart.find_by_customer_id(shopcart.customer_id)[0]
+        self.assertEqual(same_shopcart.customer_id, shopcart.customer_id)
+        self.assertEqual(same_shopcart.id, shopcart.id)
+
+    def test_find_by_item_name(self):
+        """ Find by item name """
+        shopcarts = Shopcart.all()
+        self.assertEqual(shopcarts, [])
+        shopcart = self._create_shopcart()
+        item = self._create_item()
+        shopcart.items_list.append(item)
+        shopcart.create()
+
+        # Fetch it back by name
+        same_item = Item.find_by_item_name(item.item_name)[0]
+        self.assertEqual(same_item.id, item.id)
+        self.assertEqual(same_item.item_name, item.item_name)
+        self.assertEqual(same_item.item_quantity, item.item_quantity)
+        self.assertEqual(same_item.item_price, item.item_price)
