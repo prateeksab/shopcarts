@@ -156,7 +156,7 @@ def create_shopcarts():
     This endpoint will create a shopcart based the data in the body that is posted
     """
     app.logger.info("Request to create a shopcart")
-    #check_content_type("application/json")
+    check_content_type("application/json")
     shopcart = Shopcart()
     shopcart.deserialize(request.get_json())
     shopcart.create()
@@ -244,7 +244,7 @@ def get_shopcart(shopcart_id):
     This endpoint will return a Shopcart based on it's id
     """
     app.logger.info("Request for shopcart with id: %s", shopcart_id)
-    Shopcart = Shopcart.find_or_404(shopcart_id)
+    Shopcart = Shopcart.find_by_customer_id(shopcart_id)
     return make_response(jsonify(Shopcart.serialize()), status.HTTP_200_OK)
 
 ######################################################################
@@ -254,7 +254,7 @@ def get_shopcart(shopcart_id):
 def list_items(shopcart_id):
     """ Returns all of the Items for a Shopcart """
     app.logger.info("Request for Shopcart Items...")
-    shopcart = Shopcart.find_or_404(shopcart_id)
+    shopcart = Shopcart.find_by_customer_id(shopcart_id)
     results = [item.serialize() for item in shopcart.items_list]
     return make_response(jsonify(results), status.HTTP_200_OK)
 
