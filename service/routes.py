@@ -156,7 +156,7 @@ def create_shopcarts():
     This endpoint will create a shopcart based the data in the body that is posted
     """
     app.logger.info("Request to create a shopcart")
-    #check_content_type("application/json")
+    check_content_type("application/json")
     shopcart = Shopcart()
     shopcart.deserialize(request.get_json())
     shopcart.create()

@@ -106,7 +106,7 @@ class Item(db.Model, PersistentBase):
             data (dict): A dictionary containing the resource data
         """
         try:
-            # self.id = data["id"]
+            self.id = data["id"]
             self.item_name = data["item_name"]
             self.item_quantity = data["item_quantity"]
             self.item_price = data["item_price"]
@@ -114,11 +114,11 @@ class Item(db.Model, PersistentBase):
 
         except KeyError as error:
             raise DataValidationError(
-                "Invalid Shopcart: missing " + error.args[0]
+                "Invalid Item: missing " + error.args[0]
             )
         except TypeError as error:
             raise DataValidationError(
-                "Invalid Shopcart: body of request contained bad or no data"
+                "Invalid Item: body of request contained bad or no data"
             )
         return self
     
@@ -161,7 +161,7 @@ class Shopcart(db.Model, PersistentBase):
             data (dict): A dictionary containing the resource data
         """
         try:
-            # self.id = data["id"]
+            #self.id = data["id"]
             self.customer_id = data["customer_id"]
             # handle inner list of addresses
             self.items_list = data.get("items_list")
@@ -170,10 +170,10 @@ class Shopcart(db.Model, PersistentBase):
                 item.deserialize(json_item)
                 self.item.append(item)
         except KeyError as error:
-            raise DataValidationError("Invalid Item: missing " + error.args[0])
+            raise DataValidationError("Invalid Shopcart: missing " + error.args[0])
         except TypeError as error:
             raise DataValidationError(
-                "Invalid Item: body of request contained" "bad or no data"
+                "Invalid Shopcart: body of request contained bad or no data"
             )
         return self
 
