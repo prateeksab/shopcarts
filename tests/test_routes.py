@@ -125,6 +125,24 @@ class TestShopcartServer(unittest.TestCase):
         self.assertEqual(data["item_quantity"], item.item_quantity)
         self.assertEqual(data["item_price"], item.item_price)
 
+    def test_checkout_shopcart(self):
+        """ Checkout a Shopcart REAL """
+        shopcart = self._create_shopcarts(1)[0]
+        item = ItemFactory()
+        resp = self.app.post(
+            "/shopcarts/{}/items".format(shopcart.id), 
+            json=item.serialize(), 
+            content_type=CONTENT_TYPE_JSON
+            )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        resp2 = self.app.put(
+            "/shopcarts/{}".format(shopcart.id), 
+            json=item.serialize(), 
+            content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp2.status_code, status.HTTP_204_NO_CONTENT)
+
     def test_get_item_list(self):
         """ Get a list of Items """
         self._create_items(5)
@@ -142,9 +160,8 @@ class TestShopcartServer(unittest.TestCase):
         self.assertEqual(len(data), 5)        
 
     def test_get_shopcart(self):
-        """ Get a single_test_get_shopcart """
-        # get the id of an shopcart
-        shopcart = self._create_shopcarts(1)[0]
+        """ Get a single Shopcart by ID """
+        shopcart = self._create_shopcarts(2)[0]
         resp = self.app.get(
             "/shopcarts/{}".format(shopcart.id), 
             content_type="application/json"
@@ -273,3 +290,32 @@ class TestShopcartServer(unittest.TestCase):
         #     content_type="application/json"
         # )
         # self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+    
+    def test_unsupported_media_type(self):
+        """ Send wrong media type """
+        shopcart = ShopcartFactory()
+        resp = self.app.post(
+            "/shopcarts", 
+            json=shopcart.serialize(), 
+            content_type="test/html"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+    
+    def test_method_not_allowed(self):
+        """ Make an illegal method call """
+        resp = self.app.put(
+            "/shopcarts", 
+            json={"not": "today"}, 
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_bad_request(self):
+        """ Send wrong media type """
+        shopcart = ShopcartFactory()
+        resp = self.app.post(
+            "/shopcarts", 
+            json={"name": "not enough data"}, 
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)

@@ -135,7 +135,6 @@ class TestShopcart(unittest.TestCase):
         shopcart.delete()
         shopcarts = Shopcart.all()
         self.assertEqual(len(shopcarts), 0)
-    
 
     def test_delete_shopcart_item(self):
         """ Delete an shopcarts item """

@@ -40,7 +40,6 @@ def bad_request(error):
         status.HTTP_400_BAD_REQUEST,
     )
 
-
 @app.errorhandler(status.HTTP_404_NOT_FOUND)
 def not_found(error):
     """ Handles resources not found with 404_NOT_FOUND """
@@ -65,7 +64,6 @@ def method_not_supported(error):
         ),
         status.HTTP_405_METHOD_NOT_ALLOWED,
     )
-
 
 @app.errorhandler(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 def mediatype_not_supported(error):
@@ -111,7 +109,6 @@ def index():
         ),
         status.HTTP_200_OK
     )
-
 
 ######################################################################
 # LIST ALL SHOPCARTS
@@ -198,7 +195,6 @@ def get_items(shopcart_id, item_id):
     item = Item.find_or_404(item_id)
     return make_response(jsonify(item.serialize()), status.HTTP_200_OK)
 
-
 ######################################################################
 # DELETE A SHOPCART
 ######################################################################
@@ -218,8 +214,6 @@ def delete_shopcart(shopcart_id):
         shopcart.delete()
     return make_response("", status.HTTP_204_NO_CONTENT)
 
-
-
 ######################################################################
 # DELETE AN ITEM
 ######################################################################
@@ -235,10 +229,7 @@ def delete_item(shopcart_id, item_id):
         item.delete()
     return make_response("", status.HTTP_204_NO_CONTENT)
 
-
-
-
-
+######################################################################
 # RETRIEVE A SHOPCART
 ######################################################################
 @app.route("/shopcarts/<int:shopcart_id>", methods=["GET"])
@@ -248,8 +239,8 @@ def get_shopcart(shopcart_id):
     This endpoint will return a Shopcart based on it's id
     """
     app.logger.info("Request for shopcart with id: %s", shopcart_id)
-    Shopcart = Shopcart.find_or_404(shopcart_id)
-    return make_response(jsonify(Shopcart.serialize()), status.HTTP_200_OK)
+    shopcart = Shopcart.find_or_404(shopcart_id)
+    return make_response(jsonify(shopcart.serialize()), status.HTTP_200_OK)
 
 ######################################################################
 # LIST ITEMS
@@ -261,6 +252,25 @@ def list_items(shopcart_id):
     shopcart = Shopcart.find_or_404(shopcart_id)
     results = [item.serialize() for item in shopcart.items_list]
     return make_response(jsonify(results), status.HTTP_200_OK)
+
+######################################################################
+# CHECKOUT SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>", methods=["PUT"])
+def checkout_shopcart(shopcart_id):
+    """
+    Checkout the Shopcart
+    This endpoint will deserialize items in a shopcart, call the Orders REST API, and empty the shopcart
+    """
+    app.logger.info("Request to checkout Shopcart, %s, False", shopcart_id)
+    check_content_type("application/json")
+    shopcart = Shopcart.find_or_404(shopcart_id)
+    results = [item.serialize() for item in shopcart.items_list]
+    # Call order API to send these items to be purchased
+    for item in shopcart.items_list:
+            item_id = item.id
+            delete_item(shopcart_id,item_id)
+    return make_response("", status.HTTP_204_NO_CONTENT)
 
 ######################################################################
 # UPDATE AN ITEM
@@ -279,9 +289,6 @@ def update_items(shopcart_id, item_id):
     item.shopcart_id = shopcart_id
     item.save()
     return make_response(jsonify(item.serialize()), status.HTTP_200_OK)
-
-
-
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
