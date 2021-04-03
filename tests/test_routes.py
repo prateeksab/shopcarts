@@ -128,7 +128,7 @@ class TestShopcartServer(unittest.TestCase):
 
 
     def test_delete_shopcart(self):
-        """ Delete an Shopcart """
+        """ Delete a Shopcart """
         # get the id of an shopcart
         shopcart = self._create_shopcarts(1)[0]
         resp = self.app.delete(
@@ -137,7 +137,23 @@ class TestShopcartServer(unittest.TestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 
+    def test_checkout_shopcart(self):
+        """ Checkout a Shopcart REAL """
+        shopcart = self._create_shopcarts(1)[0]
+        item = ItemFactory()
+        resp = self.app.post(
+            "/shopcarts/{}/items".format(shopcart.id), 
+            json=item.serialize(), 
+            content_type=CONTENT_TYPE_JSON
+            )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
+        resp2 = self.app.put(
+            "/shopcarts/{}".format(shopcart.id), 
+            json=item.serialize(), 
+            content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp2.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_delete_item(self):
         """ Delete an Item """

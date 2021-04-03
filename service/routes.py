@@ -40,7 +40,6 @@ def bad_request(error):
         status.HTTP_400_BAD_REQUEST,
     )
 
-
 @app.errorhandler(status.HTTP_404_NOT_FOUND)
 def not_found(error):
     """ Handles resources not found with 404_NOT_FOUND """
@@ -214,8 +213,6 @@ def delete_shopcart(shopcart_id):
         shopcart.delete()
     return make_response("", status.HTTP_204_NO_CONTENT)
 
-
-
 ######################################################################
 # DELETE AN ITEM
 ######################################################################
@@ -231,10 +228,7 @@ def delete_item(shopcart_id, item_id):
         item.delete()
     return make_response("", status.HTTP_204_NO_CONTENT)
 
-
-
-
-
+######################################################################
 # RETRIEVE A SHOPCART
 ######################################################################
 @app.route("/shopcarts/<int:shopcart_id>", methods=["GET"])
@@ -257,6 +251,24 @@ def list_items(shopcart_id):
     shopcart = Shopcart.find_or_404(shopcart_id)
     results = [item.serialize() for item in shopcart.items_list]
     return make_response(jsonify(results), status.HTTP_200_OK)
+
+######################################################################
+# CHECKOUT SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>", methods=["PUT"])
+def checkout_shopcart(shopcart_id):
+    """
+    Checkout the Shopcart
+    This endpoint will deserialize items in a shopcart, call the Orders REST API, and empty the shopcart
+    """
+    app.logger.info("Request to checkout Shopcart, %s, False", shopcart_id)
+    check_content_type("application/json")
+    shopcart = Shopcart.find_or_404(shopcart_id)
+    results = [item.serialize() for item in shopcart.items_list]
+    # Call order API to send these items to be purchased
+    for item in shopcart.items_list:
+        item.delete()
+    return make_response("", status.HTTP_204_NO_CONTENT)
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
