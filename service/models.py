@@ -106,7 +106,7 @@ class Item(db.Model, PersistentBase):
             data (dict): A dictionary containing the resource data
         """
         try:
-            self.id = data["id"]
+            #self.id = data["id"]
             self.item_name = data["item_name"]
             self.item_quantity = data["item_quantity"]
             self.item_price = data["item_price"]
@@ -130,6 +130,8 @@ class Item(db.Model, PersistentBase):
         """
         logger.info("Processing name query for %s ...", item_name)
         return cls.query.filter(cls.item_name == item_name)
+    
+    
 
 class Shopcart(db.Model, PersistentBase):
 
@@ -177,6 +179,7 @@ class Shopcart(db.Model, PersistentBase):
             )
         return self
 
+
     @classmethod
     def find_by_customer_id(cls, customer_id):
         """ Returns all Accounts with the given customer_id
@@ -185,3 +188,7 @@ class Shopcart(db.Model, PersistentBase):
         """
         logger.info("Processing name query for %s ...", customer_id)
         return cls.query.filter(cls.customer_id == customer_id)
+
+    
+   
+
