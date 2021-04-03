@@ -65,7 +65,6 @@ def method_not_supported(error):
         status.HTTP_405_METHOD_NOT_ALLOWED,
     )
 
-
 @app.errorhandler(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 def mediatype_not_supported(error):
     """ Handles unsuppoted media requests with 415_UNSUPPORTED_MEDIA_TYPE """
@@ -110,7 +109,6 @@ def index():
         ),
         status.HTTP_200_OK
     )
-
 
 ######################################################################
 # LIST ALL SHOPCARTS
@@ -197,7 +195,6 @@ def get_items(shopcart_id, item_id):
     item = Item.find_or_404(item_id)
     return make_response(jsonify(item.serialize()), status.HTTP_200_OK)
 
-
 ######################################################################
 # DELETE A SHOPCART
 ######################################################################
@@ -209,7 +206,11 @@ def delete_shopcart(shopcart_id):
     """
     app.logger.info("Request to delete shopcart with id: %s", shopcart_id)
     shopcart = Shopcart.find(shopcart_id)
+    
     if shopcart:
+        for item in shopcart.items_list:
+            item_id = item.id
+            delete_item(shopcart_id,item_id)
         shopcart.delete()
     return make_response("", status.HTTP_204_NO_CONTENT)
 
@@ -238,8 +239,8 @@ def get_shopcart(shopcart_id):
     This endpoint will return a Shopcart based on it's id
     """
     app.logger.info("Request for shopcart with id: %s", shopcart_id)
-    Shopcart = Shopcart.find_or_404(shopcart_id)
-    return make_response(jsonify(Shopcart.serialize()), status.HTTP_200_OK)
+    shopcart = Shopcart.find_or_404(shopcart_id)
+    return make_response(jsonify(shopcart.serialize()), status.HTTP_200_OK)
 
 ######################################################################
 # LIST ITEMS
@@ -267,8 +268,27 @@ def checkout_shopcart(shopcart_id):
     results = [item.serialize() for item in shopcart.items_list]
     # Call order API to send these items to be purchased
     for item in shopcart.items_list:
-        item.delete()
+            item_id = item.id
+            delete_item(shopcart_id,item_id)
     return make_response("", status.HTTP_204_NO_CONTENT)
+
+######################################################################
+# UPDATE AN ITEM
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>/items/<int:item_id>", methods=["PUT"])
+def update_items(shopcart_id, item_id):
+    """
+    Update a Shopcart
+    This endpoint will update an Item based the body that is posted
+    """
+    app.logger.info("Request to update item with id: %s", item_id)
+    check_content_type("application/json")
+    item = Item.find_or_404(item_id)
+    item.deserialize(request.get_json())
+    item.id = item_id
+    item.shopcart_id = shopcart_id
+    item.save()
+    return make_response(jsonify(item.serialize()), status.HTTP_200_OK)
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S

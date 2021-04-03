@@ -20,7 +20,6 @@ DATABASE_URI = os.getenv(
 
 BASE_URL = '/shopcarts'
 CONTENT_TYPE_JSON = "application/json"
-CONTENT_TYPE_WRONG = 'tests/html'
 
 ######################################################################
 #  T E S T   C A S E S
@@ -126,17 +125,6 @@ class TestShopcartServer(unittest.TestCase):
         self.assertEqual(data["item_quantity"], item.item_quantity)
         self.assertEqual(data["item_price"], item.item_price)
 
-
-    def test_delete_shopcart(self):
-        """ Delete a Shopcart """
-        # get the id of an shopcart
-        shopcart = self._create_shopcarts(1)[0]
-        resp = self.app.delete(
-            "/shopcarts/{}".format(shopcart.id), 
-            content_type="application/json"
-        )
-        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
-
     def test_checkout_shopcart(self):
         """ Checkout a Shopcart REAL """
         shopcart = self._create_shopcarts(1)[0]
@@ -155,8 +143,99 @@ class TestShopcartServer(unittest.TestCase):
         )
         self.assertEqual(resp2.status_code, status.HTTP_204_NO_CONTENT)
 
+    def test_get_item_list(self):
+        """ Get a list of Items """
+        self._create_items(5)
+        resp = self.app.get("/items")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), 5)
+
+    def test_get_shopcart_list(self):
+        """ Get a list of shopcarts """
+        self._create_shopcarts(5)
+        resp = self.app.get("/shopcarts")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), 5)        
+
+    def test_get_shopcart(self):
+        """ Get a single Shopcart by ID """
+        shopcart = self._create_shopcarts(2)[0]
+        resp = self.app.get(
+            "/shopcarts/{}".format(shopcart.id), 
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data["id"], shopcart.id)
+    
+    def test_get_item_list(self):
+        """ Get an item from a shopcart """
+        # create a known item
+        shopcart = self._create_shopcarts(1)[0]
+        item = ItemFactory()
+        resp = self.app.post(
+            "/shopcarts/{}/items".format(shopcart.id), 
+            json=item.serialize(), 
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        data = resp.get_json()
+        logging.debug(data)
+        shopcart_id = data["id"]
+
+        # retrieve it back
+        resp = self.app.get(
+            "/shopcarts/{}/items".format(shopcart.id), 
+            content_type="application/json" 
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        data = resp.get_json()
+        logging.debug(data)
+
+    def test_update_item(self):
+        """ Update an item on an shopcart """
+        # create a known item
+        shopcart = self._create_shopcarts(1)[0]
+        item = ItemFactory()
+        resp = self.app.post(
+            "/shopcarts/{}/items".format(shopcart.id), 
+            json=item.serialize(), 
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        data = resp.get_json()
+        logging.debug(data)
+        item_id = data["id"]
+        data["item_name"] = "XXXX"
+
+        # send the update back
+        resp = self.app.put(
+            "/shopcarts/{}/items/{}".format(shopcart.id, item_id), 
+            json=data, 
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        # retrieve it back
+        resp = self.app.get(
+            "/shopcarts/{}/items/{}".format(shopcart.id, item_id), 
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        data = resp.get_json()
+        logging.debug(data)
+        self.assertEqual(data["id"], item_id)
+        self.assertEqual(data["shopcart_id"], shopcart.id)
+        self.assertEqual(data["item_name"], "XXXX")
+
     def test_delete_item(self):
-        """ Delete an Item """
+        """ Delete an item """
         shopcart = self._create_shopcarts(1)[0]
         item = ItemFactory()
         resp = self.app.post(
@@ -176,91 +255,49 @@ class TestShopcartServer(unittest.TestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 
-        # retrieve it back and make sure shopcart is not there
+        # retrieve it back and make sure item is not there
         resp = self.app.get(
             "/shopcarts/{}/items/{}".format(shopcart.id, item_id), 
             content_type="application/json"
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_get_item_list(self):
-        """ Get a list of Items """
-        self._create_items(5)
-        resp = self.app.get("/items")
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = resp.get_json()
-        self.assertEqual(len(data), 5)
 
-    def test_get_shopcart_list(self):
-        """ Get a list of shopcarts """
-        self._create_shopcarts(5)
-        resp = self.app.get("/shopcarts")
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = resp.get_json()
-        self.assertEqual(len(data), 5)        
-
-    def test_get_shopcart(self):
-        """ Get a single_test_get_shopcart """
-        # get the id of an shopcart
-        shopcart = self._create_shopcarts(1)[0]
-        resp = self.app.get(
-            "/shopcarts/{}".format(shopcart.id), 
-            content_type=CONTENT_TYPE_JSON
-        )
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = resp.get_json()
-        self.assertEqual(data["id"], shopcart.id)
-    
-    def test_get_item_list(self):
-        """ Get an item from a shopcart """
-        # create a known item
+    def test_delete_shopcart(self):
+        """ Delete a shopcart """
         shopcart = self._create_shopcarts(1)[0]
         item = ItemFactory()
         resp = self.app.post(
             "/shopcarts/{}/items".format(shopcart.id), 
             json=item.serialize(), 
-            content_type=CONTENT_TYPE_JSON
+            content_type="application/json"
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-
         data = resp.get_json()
         logging.debug(data)
-        shopcart_id = data["id"]
+        item_id = data["id"]
 
-        # retrieve it back
-        resp = self.app.get(
-            "/shopcarts/{}/items".format(shopcart.id), 
-            content_type=CONTENT_TYPE_JSON
+        # send delete request
+        resp = self.app.delete(
+            "/shopcarts/{}".format(shopcart.id),
+            content_type="application/json"
         )
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 
-        data = resp.get_json()
-        logging.debug(data)
-
-    def test_get_account_not_found(self):
-        """ Get an Shopcart that is not found """
-        resp = self.app.get("/shopcarts/0")
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        # retrieve it back and make sure item is not there
+        # resp = self.app.get(
+        #     "/shopcarts/{}/items/{}".format(shopcart.id, item_id), 
+        #     content_type="application/json"
+        # )
+        # self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
     
-    def test_bad_request(self):
+    def test_unsupported_media_type(self):
         """ Send wrong media type """
         shopcart = ShopcartFactory()
         resp = self.app.post(
             "/shopcarts", 
-            json={"id": "not enough data"}, 
-            content_type=CONTENT_TYPE_JSON
-        )
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-    
-    def test_unsupported_media_type(self):
-        """ Get an item from a shopcart """
-        # create a known item
-        shopcart = self._create_shopcarts(1)[0]
-        item = ItemFactory()
-        resp = self.app.post(
-            "/shopcarts/{}/items".format(shopcart.id), 
-            json=item.serialize(), 
-            content_type=CONTENT_TYPE_WRONG
+            json=shopcart.serialize(), 
+            content_type="test/html"
         )
         self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
     
@@ -268,8 +305,17 @@ class TestShopcartServer(unittest.TestCase):
         """ Make an illegal method call """
         resp = self.app.put(
             "/shopcarts", 
-            json={"itsa": "no-go"}, 
-            content_type=CONTENT_TYPE_JSON
+            json={"not": "today"}, 
+            content_type="application/json"
         )
         self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-    
+
+    def test_bad_request(self):
+        """ Send wrong media type """
+        shopcart = ShopcartFactory()
+        resp = self.app.post(
+            "/shopcarts", 
+            json={"name": "not enough data"}, 
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
