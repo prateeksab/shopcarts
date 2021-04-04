@@ -12,8 +12,11 @@ Vagrant.configure(2) do |config|
   config.vm.box = "bento/ubuntu-20.04"
   config.vm.hostname = "ubuntu"
 
-  # set up network ip and port forwarding
-  config.vm.network "forwarded_port", guest: 5000, host: 5000, host_ip: "127.0.0.1"
+  # Forward Flask ports
+  config.vm.network "forwarded_port", guest: 8080, host: 8080, host_ip: "127.0.0.1"
+  # Forward CouchDB ports
+  config.vm.network "forwarded_port", guest: 5984, host: 5984, host_ip: "127.0.0.1"
+  
   config.vm.network "private_network", ip: "192.168.33.10"
 
   # Windows users need to change the permission of files and directories
@@ -73,6 +76,10 @@ Vagrant.configure(2) do |config|
     apt-get update
     apt-get install -y git tree wget vim python3-dev python3-pip python3-venv apt-transport-https libpq-dev
     apt-get upgrade python3
+    pip3 install -U pip
+    
+    # Update pip and wheel so Python packages build correctly
+    pip3 install wheel
 
     # Create a Python3 Virtual Environment and Activate it in .profile
     sudo -H -u vagrant sh -c 'python3 -m venv ~/venv'
@@ -80,25 +87,75 @@ Vagrant.configure(2) do |config|
     sudo -H -u vagrant sh -c '. ~/venv/bin/activate && cd /vagrant && pip install -r requirements.txt'
   SHELL
 
+   ######################################################################
+  # Add CouchDB docker container
   ######################################################################
-  # Add PostgreSQL docker container
+  # docker run -d --name couchdb -p 5984:5984 -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass couchdb
+  config.vm.provision "docker" do |d|
+    d.pull_images "couchdb"
+    d.run "couchdb",
+      args: "--restart=always -d --name couchdb -p 5984:5984 -v couchdb:/opt/couchdb/data -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass"
+  end
+
+  # ######################################################################
+  # # Add PostgreSQL docker container
+  # ######################################################################
+  # # docker run -d --name postgres -p 5432:5432 -v psql_data:/var/lib/postgresql/data postgres
+  # config.vm.provision :docker do |d|
+  #   d.pull_images "postgres:alpine"
+  #   d.run "postgres:alpine",
+  #      args: "-d --name postgres -p 5432:5432 -v psql_data:/var/lib/postgresql/data -e POSTGRES_PASSWORD=postgres"
+  # end
+
+  # ######################################################################
+  # # Add a test database after Postgres is provisioned
+  # ######################################################################
+  # config.vm.provision "shell", inline: <<-SHELL
+  #   # Create testdb database using postgres cli
+  #   echo "Creating test database"
+  #   sleep 10
+  #   docker exec postgres psql -c "create database testdb;" -U postgres
+  #   # Done
+  # SHELL
+
+
   ######################################################################
-  # docker run -d --name postgres -p 5432:5432 -v psql_data:/var/lib/postgresql/data postgres
-  config.vm.provision :docker do |d|
-    d.pull_images "postgres:alpine"
-    d.run "postgres:alpine",
-       args: "-d --name postgres -p 5432:5432 -v psql_data:/var/lib/postgresql/data -e POSTGRES_PASSWORD=postgres"
+  # Add CouchDB docker container
+  ######################################################################
+  # docker run -d --name couchdb -p 5984:5984 -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass couchdb
+  config.vm.provision "docker" do |d|
+    d.pull_images "couchdb"
+    d.run "couchdb",
+      args: "--restart=always -d --name couchdb -p 5984:5984 -v couchdb:/opt/couchdb/data -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass"
   end
 
   ######################################################################
-  # Add a test database after Postgres is provisioned
+  # Setup a Bluemix and Kubernetes environment
   ######################################################################
   config.vm.provision "shell", inline: <<-SHELL
-    # Create testdb database using postgres cli
-    echo "Creating test database"
-    sleep 10
-    docker exec postgres psql -c "create database testdb;" -U postgres
-    # Done
+    echo "\n************************************"
+    echo " Installing IBM Cloud CLI..."
+    echo "************************************\n"
+    # Install IBM Cloud CLI as Vagrant user
+    sudo -H -u vagrant sh -c 'curl -sL http://ibm.biz/idt-installer | bash'
+    sudo -H -u vagrant sh -c "echo 'source <(kubectl completion bash)' >> ~/.bashrc"
+    # sudo -H -u vagrant sh -c "ibmcloud cf install --version 6.46.1"
+    sudo -H -u vagrant sh -c "ibmcloud cf install"
+    sudo -H -u vagrant sh -c "echo alias ic=/usr/local/bin/ibmcloud >> ~/.bash_aliases"
+    echo "\n************************************"
+    echo "If you have an IBM Cloud API key in ~/.bluemix/apiKey.json"
+    echo "You can login with the following command:"
+    echo "\n"
+    echo "ibmcloud login -a https://cloud.ibm.com --apikey @~/.bluemix/apiKey.json -r us-south"
+    echo "ibmcloud target --cf -o <your_org_here> -s dev"
+    echo "\n************************************"
+    # Show the GUI URL for Couch DB
+    echo "\n"
+    echo "CouchDB Admin GUI can be found at:\n"
+    echo "http://127.0.0.1:5984/_utils"    
   SHELL
+
+end
+
 
 end
