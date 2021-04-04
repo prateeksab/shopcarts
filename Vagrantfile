@@ -87,15 +87,7 @@ Vagrant.configure(2) do |config|
     sudo -H -u vagrant sh -c '. ~/venv/bin/activate && cd /vagrant && pip install -r requirements.txt'
   SHELL
 
-   ######################################################################
-  # Add CouchDB docker container
-  ######################################################################
-  # docker run -d --name couchdb -p 5984:5984 -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass couchdb
-  config.vm.provision "docker" do |d|
-    d.pull_images "couchdb"
-    d.run "couchdb",
-      args: "--restart=always -d --name couchdb -p 5984:5984 -v couchdb:/opt/couchdb/data -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass"
-  end
+end
 
   # ######################################################################
   # # Add PostgreSQL docker container
