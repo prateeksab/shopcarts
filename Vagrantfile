@@ -94,37 +94,37 @@ Vagrant.configure(2) do |config|
 
   
 
-  # ######################################################################
-  # # Add PostgreSQL docker container
-  # ######################################################################
-  # # docker run -d --name postgres -p 5432:5432 -v psql_data:/var/lib/postgresql/data postgres
-  # config.vm.provision :docker do |d|
-  #   d.pull_images "postgres:alpine"
-  #   d.run "postgres:alpine",
-  #      args: "-d --name postgres -p 5432:5432 -v psql_data:/var/lib/postgresql/data -e POSTGRES_PASSWORD=postgres"
-  # end
-
-  # ######################################################################
-  # # Add a test database after Postgres is provisioned
-  # ######################################################################
-  # config.vm.provision "shell", inline: <<-SHELL
-  #   # Create testdb database using postgres cli
-  #   echo "Creating test database"
-  #   sleep 10
-  #   docker exec postgres psql -c "create database testdb;" -U postgres
-  #   # Done
-  # SHELL
-
-
   ######################################################################
-  # Add CouchDB docker container
+  # Add PostgreSQL docker container
   ######################################################################
-  # docker run -d --name couchdb -p 5984:5984 -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass couchdb
-  config.vm.provision "docker" do |d|
-    d.pull_images "couchdb"
-    d.run "couchdb",
-      args: "--restart=always -d --name couchdb -p 5984:5984 -v couchdb:/opt/couchdb/data -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass"
+  # docker run -d --name postgres -p 5432:5432 -v psql_data:/var/lib/postgresql/data postgres
+  config.vm.provision :docker do |d|
+    d.pull_images "postgres:alpine"
+    d.run "postgres:alpine",
+       args: "-d --name postgres -p 5432:5432 -v psql_data:/var/lib/postgresql/data -e POSTGRES_PASSWORD=postgres"
   end
+
+  ######################################################################
+  # Add a test database after Postgres is provisioned
+  ######################################################################
+  config.vm.provision "shell", inline: <<-SHELL
+    # Create testdb database using postgres cli
+    echo "Creating test database"
+    sleep 10
+    docker exec postgres psql -c "create database testdb;" -U postgres
+    # Done
+  SHELL
+
+
+  # ######################################################################
+  # # Add CouchDB docker container
+  # ######################################################################
+  # # docker run -d --name couchdb -p 5984:5984 -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass couchdb
+  # config.vm.provision "docker" do |d|
+  #   d.pull_images "couchdb"
+  #   d.run "couchdb",
+  #     args: "--restart=always -d --name couchdb -p 5984:5984 -v couchdb:/opt/couchdb/data -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass"
+  # end
 
   ######################################################################
   # Setup a Bluemix and Kubernetes environment
