@@ -70,7 +70,7 @@ Vagrant.configure(2) do |config|
 
   # Copy your IBM Cloud API Key if you have one
   if File.exists?(File.expand_path("~/.bluemix/apiKey.json"))
-    config.vm.provision "file", source: "~/.bluemix/apiKey.json", destination: "~/.bluemix/apiKey.json"
+    config.vm.provision "file", source: "~/.bluemix/apiKey-shopcarts.json", destination: "~/.bluemix/apiKey.json"
   end
 
   ############################################################
