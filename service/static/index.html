@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Shopcarts Demo RESTful Service</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="static/css/blue_bootstrap.min.css">
+    <script type="text/javascript" src = "static/js/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="static/js/rest_api.js"></script>
+  </head>
+  <body>
+    <div class="container">
+        <div class="page-header">
+            <h1>Shopcarts Demo REST API Service</h1>
+        </div>
+
+        <!-- Flash Message -->
+        <div class="table-responsive">
+          <table class="table">
+            <tr><td>Status:</td><td><span id="flash_message"></span></td></tr>
+          </table>
+        </div>
+
+        <div class="mx-auto" style="width: 500px;">
+            Retrieve and Delete a Shopcart:
+        </div>
+        <div class="col-md-12" id="form_data">
+            
+          
+        
+          <div class="well">
+            <div class="form-horizontal">
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="shopcart_id">Shopcart ID:</label>
+                <div class="col-sm-6">
+                  <input type="text" class="form-control" id="shopcart_id" placeholder="Enter shopcart ID">
+                </div>
+                <div class="col-sm-4">
+                  <button type="submit" class="btn btn-primary" id="retrieve-btn">Retrieve Shopcart</button>
+                  <button type="submit" class="btn btn-danger" id="delete-btn">Delete Shopcart</button>
+                </div>
+            
+              </div>
+            </div> <!-- form div -->
+
+            Create an Empty Shopcart
+            <div class="form-horizontal">
+                <div class="form-group">
+                  <label class="control-label col-sm-2" for="customer_id">Customer ID:</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" id="customer_id" placeholder="Enter customer id">
+                  </div>
+                </div>
+
+            <div class="col-sm-4">
+                <button type="submit" class="btn btn-primary" id="create-shopcart-btn">Create Shopcart</button>
+            </div>
+
+            Add Items to Cart
+
+            <div class="form-horizontal">
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="customer_id">Customer ID:</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" id="customer_id" placeholder="Enter customer id">
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="item_available">Items Available:</label>
+                <div class="col-sm-10">
+                  <select class="form-control" id="item_available">
+                      <option value="item_dog" selected>Item_Dog</option>
+                      <option value="item_cat">Item_Cat</option>
+                      <option value="item_house" selected>Item_House</option>
+                      <option value="item_pipe">Item_Pipe</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="items_list">Item Quantity:</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" id="items_list" placeholder="Enter Item Quantity">
+                </div>
+              </div>
+            
+              <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button type="submit" class="btn btn-primary" id="add-item-btn">Add Item to cart</button>
+                </div>  
+                    
+
+              </div>
+
+              <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                  <button type="submit" class="btn btn-primary" id="search-btn">Search</button>
+                  <button type="submit" class="btn btn-primary" id="clear-btn">Clear</button>
+                  <button type="submit" class="btn btn-success" id="create-btn">Create</button>
+                  <button type="submit" class="btn btn-warning" id="update-btn">Update</button>
+                </div>
+              </div>
+          </div> <!-- form div -->
+        </div>
+
+        <!-- Search Results -->
+        <div class="table-responsive col-md-12" id="search_results">
+          <table class="table-striped">
+            <thead>
+            <tr>
+                <th class="col-md-1">ID</th>
+                <th class="col-md-4">Customer ID</th>
+                <th class="col-md-4">Item List</th>
+            </tr>
+            </thead>
+          </table>
+        </div>
+
+        <footer>
+          <br><br>
+          <p>&copy; NYU DevOps Shopcart group 2021</p>
+        </footer>
+        </div><!--/span-->
+     </div><!--/row-->
+
+  </div><!-- container -->
+  </body>
+</html>
