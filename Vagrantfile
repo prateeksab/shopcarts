@@ -13,9 +13,9 @@ Vagrant.configure(2) do |config|
   config.vm.hostname = "ubuntu"
 
   # Forward Flask ports
-  config.vm.network "forwarded_port", guest: 8079, host: 8079, host_ip: "127.0.0.1"
+  config.vm.network "forwarded_port", guest: 8080, host: 8080, host_ip: "127.0.0.1"
   # Forward CouchDB ports
-  config.vm.network "forwarded_port", guest: 5985, host: 5985, host_ip: "127.0.0.1"
+  config.vm.network "forwarded_port", guest: 5984, host: 5984, host_ip: "127.0.0.1"
   
   config.vm.network "private_network", ip: "192.168.33.10"
 

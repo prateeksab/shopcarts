@@ -96,6 +96,14 @@ def internal_server_error(error):
 
 
 ######################################################################
+# GET HEALTH CHECK
+######################################################################
+@app.route('/healthcheck')
+def healthcheck():
+    """ Let them know our heart is still beating """
+    return make_response(jsonify(status=200, message='Healthy'), status.HTTP_200_OK)
+
+######################################################################
 # GET INDEX
 ######################################################################
 @app.route("/")
@@ -109,6 +117,22 @@ def index():
         ),
         status.HTTP_200_OK
     )
+
+######################################################################
+# GET UI
+######################################################################
+@app.route("/ui")
+def index_ui():
+    """ Root URL response """
+    return app.send_static_file('index.html')
+
+######################################################################
+# GET PAGE 2
+######################################################################
+@app.route("/ui/page2")
+def index_ui_page2():
+    """ Root URL response """
+    return app.send_static_file('page2.html')
 
 ######################################################################
 # LIST ALL SHOPCARTS
@@ -153,9 +177,21 @@ def create_shopcarts():
     This endpoint will create a shopcart based the data in the body that is posted
     """
     app.logger.info("Request to create a shopcart")
-    check_content_type("application/json")
+    data = {}
+    # Check for form submission data
+    if request.headers.get('Content-Type') == 'application/x-www-form-urlencoded':
+        app.logger.info('Getting data from form submit')
+        data = {
+            'customer_id':request.form['customer_id'],
+            'items_list':[]
+        }
+    else:
+        check_content_type("application/json")
+        app.logger.info('Getting json data from API call')
+        data = request.get_json()
+    app.logger.info(data)
     shopcart = Shopcart()
-    shopcart.deserialize(request.get_json())
+    shopcart.deserialize(data)
     shopcart.create()
     message = shopcart.serialize()
     location_url = url_for("get_shopcarts", id=shopcart.id, _external=True)
@@ -239,6 +275,7 @@ def get_shopcart(shopcart_id):
     This endpoint will return a Shopcart based on it's id
     """
     app.logger.info("Request for shopcart with id: %s", shopcart_id)
+
     shopcart = Shopcart.find_or_404(shopcart_id)
     return make_response(jsonify(shopcart.serialize()), status.HTTP_200_OK)
 
@@ -289,6 +326,13 @@ def update_items(shopcart_id, item_id):
     item.shopcart_id = shopcart_id
     item.save()
     return make_response(jsonify(item.serialize()), status.HTTP_200_OK)
+
+######################################################################
+# LEARN AJAX REQUEST
+######################################################################
+@app.route("/shopcarts/random-entry", methods=["POST"])
+def create_entry():
+    return "Thanks"
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
