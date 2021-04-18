@@ -22,19 +22,18 @@
           </table>
         </div>
 
-        <div class="mx-auto" style="width: 500px;">
-            Retrieve and Delete a Shopcart:
-        </div>
         <div class="col-md-12" id="form_data">
-            
-          
+          <div style="height: 30px; width:300px; background-color: rgba(255, 81, 0, 0.514);">
+          Retrieve and Delete a Shopcart:
+          </div>
+        </div>
         
           <div class="well">
             <div class="form-horizontal">
               <div class="form-group">
-                <label class="control-label col-sm-2" for="shopcart_id">Shopcart ID:</label>
+                <label class="control-label col-sm-2" for="shopcart_id_label_1">Shopcart ID:</label>
                 <div class="col-sm-6">
-                  <input type="text" class="form-control" id="shopcart_id" placeholder="Enter shopcart ID">
+                  <input type="text" class="form-control" id="shopcart_id_input_1" placeholder="Enter shopcart ID">
                 </div>
                 <div class="col-sm-4">
                   <button type="submit" class="btn btn-primary" id="retrieve-btn">Retrieve Shopcart</button>
@@ -43,45 +42,66 @@
             
               </div>
             </div> <!-- form div -->
-
-            Create an Empty Shopcart
-            <div class="form-horizontal">
+          </div>
+          <div class="col-md-12" id="form_data">
+              <div style="height: 30px; width:300px; background-color: rgba(255, 81, 0, 0.514);">
+              Create an Empty Shopcart
+              </div>
+          </div>
+            <div class="well">
+              <div class="form-horizontal">
                 <div class="form-group">
-                  <label class="control-label col-sm-2" for="customer_id">Customer ID:</label>
-                  <div class="col-sm-10">
-                    <input type="text" class="form-control" id="customer_id" placeholder="Enter customer id">
+                  <label class="control-label col-sm-2" for="customer_id_label_1">Customer ID:</label>
+                  <div class="col-sm-6">
+                    <input type="text" class="form-control" id="customer_id_input_1" placeholder="Enter customer id">
                   </div>
-                </div>
-
-            <div class="col-sm-4">
-                <button type="submit" class="btn btn-primary" id="create-shopcart-btn">Create Shopcart</button>
-            </div>
-
-            Add Items to Cart
-
-            <div class="form-horizontal">
-              <div class="form-group">
-                <label class="control-label col-sm-2" for="customer_id">Customer ID:</label>
-                <div class="col-sm-10">
-                  <input type="text" class="form-control" id="customer_id" placeholder="Enter customer id">
+                    <div class="col-sm-4">
+                      <button type="submit" class="btn btn-success" id="create-shopcart-btn">Create Shopcart</button>
+                    </div>
                 </div>
               </div>
+            </div>
+
+            <div class="well">
               
+                <div style="height: 30px; width:300px; background-color: rgba(255, 81, 0, 0.514);">
+                  Add / Update Items to Cart
+                
+              </div>
+              <div class="form-horizontal">
+
+                <div class="form-group">
+                  <label class="control-label col-sm-2" for="shopcart_id_label_2">Shopcart ID:</label>
+                    <div class="col-sm-10">
+                    <input type="text" class="form-control" id="shopcart_id_input_2" placeholder="Enter shopcart id">
+                  </div>
+                </div>
+              
+              
+
               <div class="form-group">
-                <label class="control-label col-sm-2" for="item_available">Items Available:</label>
+                <label class="control-label col-sm-2" for="item_name_label">Item Name:</label>
                 <div class="col-sm-10">
-                  <select class="form-control" id="item_available">
-                      <option value="item_dog" selected>Item_Dog</option>
+                  <select class="form-control" id="item_name_input"placeholder="Select Item from list">
+                    <option value="item_none" selected></option>  
+                    <option value="item_dog">Item_Dog</option>
                       <option value="item_cat">Item_Cat</option>
-                      <option value="item_house" selected>Item_House</option>
+                      <option value="item_house">Item_House</option>
                       <option value="item_pipe">Item_Pipe</option>
                   </select>
                 </div>
               </div>
               <div class="form-group">
-                <label class="control-label col-sm-2" for="items_list">Item Quantity:</label>
+                <label class="control-label col-sm-2" for="item_quantity_label">Item Quantity:</label>
                 <div class="col-sm-10">
-                  <input type="text" class="form-control" id="items_list" placeholder="Enter Item Quantity">
+                  <input type="text" class="form-control" id="item_quantity_input" placeholder="Enter Item Quantity">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="item_price_label">Item Price:</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" id="item_price_input" placeholder="Enter Item Price">
                 </div>
               </div>
             
@@ -93,30 +113,46 @@
 
               </div>
 
-              <div class="form-group">
-                <div class="col-sm-offset-2 col-sm-10">
-                  <button type="submit" class="btn btn-primary" id="search-btn">Search</button>
-                  <button type="submit" class="btn btn-primary" id="clear-btn">Clear</button>
-                  <button type="submit" class="btn btn-success" id="create-btn">Create</button>
-                  <button type="submit" class="btn btn-warning" id="update-btn">Update</button>
-                </div>
+              
               </div>
           </div> <!-- form div -->
         </div>
+      </div>
+      
+      <div style="height: 50px; width:1000px;">
+        <div class="form-group">
+          <div class="col-sm-offset-4 col-sm-10">
+            <button type="submit" class="btn btn-primary" id="search-btn">Search</button>
+            <button type="submit" class="btn btn-primary" id="list-items-btn">List All Items in Shopcart</button>
+            <button type="submit" class="btn btn-primary" id="clear-btn">Clear</button>
+            <button type="submit" class="btn btn-success" id="create-btn">Create</button>
+            <button type="submit" class="btn btn-warning" id="update-btn">Update</button>
+          </div>
+        </div>
+      </div>
+      
 
         <!-- Search Results -->
-        <div class="table-responsive col-md-12" id="search_results">
-          <table class="table-striped">
-            <thead>
-            <tr>
-                <th class="col-md-1">ID</th>
-                <th class="col-md-4">Customer ID</th>
-                <th class="col-md-4">Item List</th>
-            </tr>
-            </thead>
-          </table>
+        <div style="height: 100px; width:1000px;">
+          <div class="col-sm-offset-3 col-sm-10">
+        <div class="well">
+          
+          
+          <div class="table-responsive col-md-15" id="search_results">
+            <table class="table-striped">
+              <thead>
+              <tr>
+                <th class="col-md-1">Item ID</th>
+                <th class="col-md-4">Item Name</th>
+                <th class="col-md-4">Item Quantity</th>
+                <th class="col-md-4">Item Price</th>
+              </tr>
+              </thead>
+            </table>
+          </div>
         </div>
-
+      </div>
+    </div>
         <footer>
           <br><br>
           <p>&copy; NYU DevOps Shopcart group 2021</p>

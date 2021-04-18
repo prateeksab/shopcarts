@@ -1,7 +1,7 @@
 $(function () {
 
     // ****************************************
-    //  U T I L I T Y   F U N C T I O N S
+    //  U T I L I T Y   F U N C T I O N Svagrant 
     // ****************************************
 
     // Updates the form with data from the response
@@ -18,9 +18,12 @@ $(function () {
 
     /// Clears all form fields
     function clear_form_data() {
-        $("#shopcart_id").val("");
-        $("#customer_id").val("");
-        $("#items_available").val("");
+        $("#shopcart_id_input_1").val("");
+        $("#customer_id_input_1").val("");
+        $("#shopcart_id_input_2").val("");
+        $("#item_name_input").val("");
+        $("#item_quantity_input").val("");
+        $("#item_price_input").val("");
     }
 
     // Updates the flash message area
@@ -35,13 +38,12 @@ $(function () {
 
     $("#create-shopcart-btn").click(function () {
 
-        var customer_id = $("#customer_id").val();
+        var customer_id = $("#customer_id_input_1").val();
         var items_list = [];
 
         var data = {
-            "cusomer_id": customer_id,
-            "items_list": []
-            
+            "customer_id": customer_id,
+            "items_list":[]
         };
 
         console.log(data)
@@ -51,6 +53,40 @@ $(function () {
             url: "/shopcarts",
             contentType: "application/json",
             data: JSON.stringify(data),
+        });
+
+        ajax.done(function(res){
+            update_form_data(res)
+            flash_message("Successfully created the shopcart for customer: " + customer_id)
+            flash_message(res.responseJSON.message)
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+    });
+
+    // ***************************************
+    // Add Items to cart
+    // ***************************************
+    $("#add-item-btn").click(function(){
+        var shopcart_id = $("#shopcart_id_input_2").val();
+        var item_name = $("#item_name_input").val();
+        var item_quantity =$("#item_quantity_input").val();
+        var item_price=$("#item_price_input").val();
+
+        var data ={
+            "shopcart_id": shopcart_id,
+            "item_name": item_name,
+            "item_quantity": item_quantity,
+            "item_price":item_price
+        };
+
+        var ajax = $.ajax({
+            type:"POST",
+            url:"/shopcarts/"+shopcart_id+"/items",
+            contentType: "application/json",
+            data: JSON.stringify(data)
         });
 
         ajax.done(function(res){
@@ -105,47 +141,48 @@ $(function () {
 
     $("#retrieve-btn").click(function () {
         console.log("Function works")
-        var shopcart_id = $("#shopcart_id").val();
+        var shopcart_id = $("#shopcart_id_input_1").val();
 
         var ajax = $.ajax({
             type: "GET",
             url: "/shopcarts/" + shopcart_id,
             contentType: "application/json",
             data: ''
-        })
+        });
 
         ajax.done(function(res){
             //alert(res.toSource())
             //update_form_data(res)
-            flash_message("Success")
+            flash_message("Shopcart with ID "+ shopcart_id + " Exists.")
+            //flash_message(res.responseJSON.message)
         });
 
         ajax.fail(function(res){
             //clear_form_data()
             //flash_message(res.responseJSON.message)
-            flash_message("Error in retrieve-btn")
+            flash_message("Shopcart with ID "+ shopcart_id + " Does not exist.")
         });
 
     });
 
     // ****************************************
-    // Delete a Pet
+    // Delete a Shopcart
     // ****************************************
 
     $("#delete-btn").click(function () {
 
-        var pet_id = $("#pet_id").val();
+        var shopcart_id = $("#shopcart_id_input_1").val();
 
         var ajax = $.ajax({
             type: "DELETE",
-            url: "/pets/" + pet_id,
+            url: "/shopcarts/" + shopcart_id,
             contentType: "application/json",
-            data: '',
-        })
+            data: ''
+        });
 
         ajax.done(function(res){
-            clear_form_data()
-            flash_message("Pet has been Deleted!")
+            //clear_form_data()
+            flash_message("shopcart " + shopcart_id + " has been Deleted!")
         });
 
         ajax.fail(function(res){
@@ -158,8 +195,57 @@ $(function () {
     // ****************************************
 
     $("#clear-btn").click(function () {
-        $("#pet_id").val("");
+        
         clear_form_data()
+    });
+
+    // ****************************************
+    // List all items in a shopcart
+    // ****************************************
+
+    $("#list-items-btn").click(function(){
+        var shopcart_id = $("shopcart_id_input_2").val();
+
+        var ajax = $.ajax({
+            type: "GET",
+            url: "/shopcarts/" + shopcart_id + "/items",
+            contentType: "application/json",
+            data: ''
+        })
+
+        ajax.done(function(res){
+            //alert(res.toSource())
+            $("#search_results").empty();
+            $("#search_results").append('<table class="table-striped" cellpadding="10">');
+            var header = '<tr>'
+            header += '<th style="width:10%">Item ID</th>'
+            header += '<th style="width:40%">Item Name</th>'
+            header += '<th style="width:40%">Item Quantity</th>'
+            header += '<th style="width:10%">Item Price</th ></tr>'
+            $("#search_results").append(header);
+            var firstItem = "";
+
+            for(var i = 0; i < res.length; i++) {
+                var item = res[i];
+                var row = "<tr><td>"+item.id+"</td><td>"+item.item_name+"</td><td>"+item.item_quantity+"</td><td>"+item.item_price+"</td></tr>";
+                $("#search_results").append(row);
+                if (i == 0) {
+                    firstItem = item;
+                }
+            };
+
+            $("#search_results").append('</table>');
+
+            flash_message("Success");
+
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+
+
+
     });
 
     // ****************************************
@@ -207,7 +293,7 @@ $(function () {
             header += '<th style="width:10%">ID</th>'
             header += '<th style="width:40%">Name</th>'
             header += '<th style="width:40%">Category</th>'
-            header += '<th style="width:10%">Available</th></tr>'
+            header += '<th style="width:10%">Available</th ></tr>'
             $("#search_results").append(header);
             var firstPet = "";
             for(var i = 0; i < res.length; i++) {

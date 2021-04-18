@@ -127,6 +127,14 @@ def index_ui():
     return app.send_static_file('index.html')
 
 ######################################################################
+# GET PAGE 2
+######################################################################
+@app.route("/ui/page2")
+def index_ui_page2():
+    """ Root URL response """
+    return app.send_static_file('page2.html')
+
+######################################################################
 # LIST ALL SHOPCARTS
 ######################################################################
 @app.route("/shopcarts", methods=["GET"])
