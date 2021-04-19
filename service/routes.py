@@ -10,6 +10,7 @@ import logging
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from flask_api import status  # HTTP Status Codes
 from werkzeug.exceptions import NotFound
+import json
 
 # For this example we'll use SQLAlchemy, a popular ORM that supports a
 # variety of backends including SQLite, MySQL, and PostgreSQL
@@ -213,6 +214,22 @@ def create_items(shopcart_id):
     shopcart = Shopcart.find_or_404(shopcart_id)
     item = Item()
     item.deserialize(request.get_json())
+    # app.logger.info("Finding item: "+ item.item_name)
+    # items_list = shopcart.items_list
+    # #app.logger.info("First item in the list is: " + items_list[0].item_name)
+    # flag=False
+    # for x in items_list:
+    #     if x.item_name == item.item_name:
+    #         app.logger.info("Item already exists in cart. Will update price and quantity")
+    #         #item.item_price = x.item_price
+    #         #item.item_quantity = x.item_quantity
+    #         #item.shopcart_id = shopcart_id
+    #         #item.save()
+    #         update_items(shopcart_id=shopcart_id,item_id=x.id)
+    #         flag=True
+    # if not flag:
+    #     app.logger.info("Item not found in cart, will be added")    
+    #     shopcart.items_list.append(item)
     shopcart.items_list.append(item)
     shopcart.save()
     message = item.serialize()
