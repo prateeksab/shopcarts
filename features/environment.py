@@ -2,14 +2,18 @@
 Environment for Behave Testing
 """
 from os import getenv
+from behave import *
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+
 
 WAIT_SECONDS = int(getenv('WAIT_SECONDS', '60'))
 BASE_URL = getenv('BASE_URL', 'http://localhost:8080')
 
 def before_all(context):
     """ Executed once before all tests """
-    options = webdriver.ChromeOptions()
+    #options = webdriver.ChromeOptions()
+    options = Options()
     options.add_argument("start-maximized") # open Browser in maximized mode
     options.add_argument("disable-infobars") # disabling infobars
     options.add_argument("--disable-extensions") # disabling extensions
@@ -31,3 +35,11 @@ def before_all(context):
 def after_all(context):
     """ Executed after all tests """
     context.driver.quit()
+
+if __name__=='__main__':
+    chrome_options = Options()
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--disable-dev-shm-usage')
+    d = webdriver.Chrome('/home/PycharmProjects/chromedriver',chrome_options=chrome_options)
+    d.get('https://www.google.nl/')

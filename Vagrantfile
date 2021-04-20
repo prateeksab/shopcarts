@@ -79,7 +79,7 @@ Vagrant.configure(2) do |config|
   config.vm.provision "shell", inline: <<-SHELL
     # Update and install
     apt-get update
-    apt-get install -y git tree wget vim python3-dev python3-pip python3-venv apt-transport-https libpq-dev
+    apt-get install -y git tree wget vim jq python3-dev python3-pip python3-venv apt-transport-https libpq-dev 
     apt-get upgrade python3
     pip3 install -U pip
     
@@ -88,6 +88,9 @@ Vagrant.configure(2) do |config|
 
     # Install Chromium Driver
     apt-get install -y chromium-chromedriver
+
+    # Install Slenium
+    apt-get install -y python3-selenium
 
     # Create a Python3 Virtual Environment and Activate it in .profile
     sudo -H -u vagrant sh -c 'python3 -m venv ~/venv'

@@ -107,8 +107,8 @@ def healthcheck():
 ######################################################################
 # GET INDEX
 ######################################################################
-@app.route("/")
-def index():
+@app.route("/api")
+def index_api():
     """ Root URL response """
     return (
         jsonify(
@@ -122,8 +122,8 @@ def index():
 ######################################################################
 # GET UI
 ######################################################################
-@app.route("/ui")
-def index_ui():
+@app.route("/")
+def index():
     """ Root URL response """
     return app.send_static_file('index.html')
 
