@@ -78,10 +78,10 @@ class TestShopcartServer(unittest.TestCase):
 
     def test_index(self):
         """ Test index call """
-        resp = self.app.get("/api")
+        resp = self.app.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = resp.get_json()
-        self.assertEqual(data["name"], "Shopcart REST API Service")
+        # data = resp.get_json()
+        self.assertIn(b'Shopcart REST API Service',resp.data)
     
     def test_create_shopcart(self):
         """ Create a new Shopcart """
