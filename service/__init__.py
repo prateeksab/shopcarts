@@ -13,12 +13,12 @@ from flask_cors import CORS
 # Create Flask application
 app = Flask(__name__)
 app.config.from_object("config")
-CORS(app)
-cors = CORS(app,resouces={
-    r"/*":{
-        "origins":"*"
-    }
-})
+#CORS(app)
+#cors = CORS(app,resouces={
+#    r"/*":{
+#         "origins":"*"
+#     }
+# })
 
 # Import the rutes After the Flask app is created
 from service import routes, models
