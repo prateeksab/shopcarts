@@ -107,33 +107,18 @@ def healthcheck():
 ######################################################################
 # GET INDEX
 ######################################################################
-@app.route("/api")
+@app.route("/")
 def index_api():
     """ Root URL response """
     return (
-        jsonify(
-            name="Shopcart REST API Service",
-            version="1.0",
-            paths=url_for("list_shopcarts", _external=True),
-        ),
-        status.HTTP_200_OK
+        # jsonify(
+        #     name="Shopcart REST API Service",
+        #     version="1.0",
+        #     paths=url_for("list_shopcarts", _external=True),
+        # ),
+        # status.HTTP_200_OK,
+        app.send_static_file('index.html')
     )
-
-######################################################################
-# GET UI
-######################################################################
-@app.route("/")
-def index():
-    """ Root URL response """
-    return app.send_static_file('index.html')
-
-######################################################################
-# GET PAGE 2
-######################################################################
-@app.route("/ui/page2")
-def index_ui_page2():
-    """ Root URL response """
-    return app.send_static_file('page2.html')
 
 ######################################################################
 # LIST ALL SHOPCARTS
