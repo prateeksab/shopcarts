@@ -6,28 +6,28 @@ $(function () {
 
     // Updates the form with data from the response
     function update_item_form_data(res) {
-        $("#shopcart_id_input_2").val(res.shopcart_id);
-        $("#item_id_input_1").val(res.id);
-        $("#item_name_input").val(res.item_name);
-        $("#item_quantity_input").val(res.item_quantity);
-        $("#item_price_input").val(res.item_price);
+        $("#shopcart_id_2").val(res.shopcart_id);
+        $("#item_id").val(res.id);
+        $("#item_name").val(res.item_name);
+        $("#item_quantity").val(res.item_quantity);
+        $("#item_price").val(res.item_price);
     }
 
     function update_shopcart_form(res){
-        $("#shopcart_id_input_1").val(res.id);
-        $("#customer_id_input_1").val(res.customer_id);
-        $("#shopcart_id_input_2").val(res.id);
+        $("#shopcart_id").val(res.id);
+        $("#shopcart_customerid").val(res.customer_id);
+        $("#shopcart_id_2").val(res.id);
     }
 
     /// Clears all form fields
     function clear_form_data() {
-        $("#shopcart_id_input_1").val("");
-        $("#customer_id_input_1").val("");
-        $("#shopcart_id_input_2").val("");
-        $("#item_id_input_1").val("");
-        $("#item_name_input").val("");
-        $("#item_quantity_input").val("");
-        $("#item_price_input").val("");
+        $("#shopcart_id").val("");
+        $("#shopcart_customerid").val("");
+        $("#shopcart_id_2").val("");
+        $("#item_id").val("");
+        $("#item_name").val("");
+        $("#item_quantity").val("");
+        $("#item_price").val("");
     }
 
     // Updates the flash message area
@@ -42,7 +42,7 @@ $(function () {
 
     $("#create-shopcart-btn").click(function () {
 
-        var customer_id = $("#customer_id_input_1").val();
+        var customer_id = $("#shopcart_customerid").val();
         var items_list = [];
 
         var data = {
@@ -76,10 +76,10 @@ $(function () {
     // Add Items to cart
     // ***************************************
     $("#add-item-btn").click(function(){
-        var shopcart_id = $("#shopcart_id_input_2").val();
-        var item_name = $("#item_name_input").val();
-        var item_quantity =$("#item_quantity_input").val();
-        var item_price=$("#item_price_input").val();
+        var shopcart_id = $("#shopcart_id_2").val();
+        var item_name = $("#item_name").val();
+        var item_quantity =$("#item_quantity").val();
+        var item_price=$("#item_price").val();
 
         var data ={
             "shopcart_id": shopcart_id,
@@ -112,11 +112,11 @@ $(function () {
 
     $("#update-item-btn").click(function () {
 
-        var shopcart_id = $("#shopcart_id_input_2").val();
-        var item_id =  $("#item_id_input_1").val();
-        var item_name = $("#item_name_input").val();
-        var item_quantity = $("#item_quantity_input").val();
-        var item_price = $("#item_price_input").val();
+        var shopcart_id = $("#shopcart_id_2").val();
+        var item_id =  $("#item_id").val();
+        var item_name = $("#item_name").val();
+        var item_quantity = $("#item_quantity").val();
+        var item_price = $("#item_price").val();
 
         var data = {
             "item_name": item_name,
@@ -150,7 +150,7 @@ $(function () {
 
     $("#retrieve-btn").click(function () {
         console.log("Function works")
-        var shopcart_id = $("#shopcart_id_input_1").val();
+        var shopcart_id = $("#shopcart_id").val();
 
         var ajax = $.ajax({
             type: "GET",
@@ -180,7 +180,7 @@ $(function () {
 
     $("#delete-btn").click(function () {
 
-        var shopcart_id = $("#shopcart_id_input_1").val();
+        var shopcart_id = $("#shopcart_id").val();
 
         var ajax = $.ajax({
             type: "DELETE",
@@ -205,8 +205,8 @@ $(function () {
 
     $("#delete-item-btn").click(function () {
 
-        var shopcart_id = $("#shopcart_id_input_2").val();
-        var item_id = $("#item_id_input_1").val();
+        var shopcart_id = $("#shopcart_id_2").val();
+        var item_id = $("#item_id").val();
 
         var ajax = $.ajax({
             type: "DELETE",
@@ -282,7 +282,7 @@ $(function () {
     // ****************************************
 
     $("#list-items-btn").click(function(){
-        var shopcart_id = $("#shopcart_id_input_2").val();
+        var shopcart_id = $("#shopcart_id_2").val();
 
         var ajax = $.ajax({
             type: "GET",
