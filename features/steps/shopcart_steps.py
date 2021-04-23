@@ -12,88 +12,113 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support import expected_conditions
-from service import app
 
+###############################################################
+##                                                           ##
+##           IGNORE THE COMMENTED OUT SECTION                ##
+##             CANNOT MAKE IT WORK, FOR NOW                  ##
+##                                                           ##
+###############################################################
+
+    # Given the following shopcarts
+    #     | id | customer_id |
+    #     | 1  | 444         |
+    #     | 2  | 555         |
+    #     | 3  | 777         |
+
+    # Given the following items
+    #     | shopcart_id | id | item_name | item_quantity | item_price |
+    #     | 1           | 1  | burger    | 3             | 2          |
+    #     | 2           | 2  | toy       | 15            | 6.32       |
+    #     | 3           | 3  | watch     | 2             | 195.30     |
+
+    # @given(u"the following shopcarts")
+# def step_impl(context):
+#     """ list all of the shopcarts and delete them one by one """
+#     headers = {"Content-Type": "application/json"}
+#     context.resp = requests.get(context.base_url + '/shopcarts', headers=headers)
+#     expect(context.resp.status_code).to_equal(200)
+#     for shopcart in context.resp.json():
+#         context.resp = requests.delete(context.base_url + '/shopcarts/' + str(shopcart["_id"]), headers=headers)
+#         expect(context.resp.status_code).to_equal(204)
+    
+#     create_url = context.base_url + "/shopcarts"
+#     for row in context.table:
+#         data = {
+#             "id": row["id"],
+#             "customer_id": row["customer_id"],
+#             "item_list": [],
+#         }
+#         payload = json.dumps(data)
+#         context.resp = requests.post(create_url, data=payload, headers=headers)
+#         expect(context.resp.status_code).to_equal(201)
+
+# @given(u"the following items")
+# def step_impl(context):
+#     """ load new items deleted by given shopcarts """
+#     headers = {"Content-Type": "application/json"}
+#     create_url = context.base_url + "/shopcarts/"
+    
+#     for row in context.table:
+#         data = {
+#             "shopcart_id": row["shopcart_id"],
+#             "id": row["id"],
+#             "item_name": row["item_name"],
+#             "item_quantity": row["item_quantity"],
+#             "item_price": row["item_price"],
+#         }
+#         payload = json.dumps(data)
+#         context.resp = requests.post(
+#             create_url + row["shopcart_id"] + "/items" + row["id"], 
+#             data=payload,
+#             headers=headers,
+#         )
+#         expect(context.resp.status_code).to_equal(201)
 
 # SERVER START
-
-@given(u'the server is started')
+@given(u'there are no shopcarts')
 def step_impl(context):
-    context.app = app.test_client()
+    headers = {'Content-Type': 'application/json'}
+    # list all of the shopcarts and delete them one by one
+    context.resp = requests.get(context.base_url + '/shopcarts', headers=headers)
+    expect(context.resp.status_code).to_equal(200)
+    for shopcart in context.resp.json():
+        context.resp = requests.delete(context.base_url + '/shopcarts/' + str(shopcart["id"]), headers=headers)
+        expect(context.resp.status_code).to_equal(204)
 
 @when(u'I visit the "Home Page"')
 def step_impl(context):
-    context.resp = context.app.get('/')
+    context.driver.get(context.base_url)
+    # context.driver.save_screenshot('homepage.png')
 
 @then(u'I should see "{message}"')
 def step_impl(context, message):
-    assert message in str(context.resp.data)
+    expect(context.driver.title).to_contain(message)
 
 @then(u'I should not see "{message}"')
 def step_impl(context, message):
-    assert message not in str(context.resp.data)
+    error_msg = "I should not see '%s' in '%s'" % (message, context.resp.text)
+    ensure(message in context.resp.text, False, error_msg)
 
-# ADD AN ITEM TO A SHOPCART
-@when(u'I set the "{element_name}" to "{text_string}"')
+@when(u'I set the "{element_name}" field to "{text_string}"')
 def step_impl(context, element_name, text_string):
-    element = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
-        expected_conditions.presence_of_element_located((By.ID, element_name.lower()))
-    )
+    # context.driver.save_screenshot('debug.png')
+    element_id = element_name.lower()
+    element = context.driver.find_element_by_id(element_id)
     element.clear()
     element.send_keys(text_string)
 
+@when(u'I press the "{button}" button')
+def step_impl(context, button):
+    button_id = button.lower() + '-btn'
+    context.driver.find_element_by_id(button_id).click()
 
-    # WebDriverWait()
-    # element = context.driver.find_element_by_id(element_name.lower())
-    # element.clear()
-    # element.send_keys(text_string)
-    # raise NotImplementedError(u'STEP: When I set the "Customer ID" to "2020"')
-
-# @when(u'I press the "Create Shopcart" button')
-# def step_impl(context):
-#     raise NotImplementedError(u'STEP: When I press the "Create Shopcart" button')
-
-
-# @when(u'I set "Shopcart ID" to "1"')
-# def step_impl(context):
-#     raise NotImplementedError(u'STEP: When I set "Shopcart ID" to "1"')
-
-
-# @then(u'I should see the message "Successfully created the shopcart for customer: 2020. Shopcart ID is 1"')
-# def step_impl(context):
-#     raise NotImplementedError(u'STEP: Then I should see the message "Successfully created the shopcart for customer: 2020. Shopcart ID is 1"')
-
-
-# @then(u'I press the "Retrieve Shopcart" button')
-# def step_impl(context):
-#     raise NotImplementedError(u'STEP: Then I press the "Retrieve Shopcart" button')
-
-
-# @then(u'I set "Item ID" to "100001"')
-# def step_impl(context):
-#     raise NotImplementedError(u'STEP: Then I set "Item ID" to "100001"')
-
-
-# @then(u'I set "Item Name" to "Hungry Hippos"')
-# def step_impl(context):
-#     raise NotImplementedError(u'STEP: Then I set "Item Name" to "Hungry Hippos"')
-
-
-# @then(u'I set "Item Quantity" to "25"')
-# def step_impl(context):
-#     raise NotImplementedError(u'STEP: Then I set "Item Quantity" to "25"')
-
-
-# @then(u'I set "Item Price" to "99.99"')
-# def step_impl(context):
-#     raise NotImplementedError(u'STEP: Then I set "Item Price" to "99.99"')
-
-
-# @then(u'I press the "Add Item to cart" button')
-# def step_impl(context):
-#     raise NotImplementedError(u'STEP: Then I press the "Add Item to cart" button')
-
-
-# @then(u'I should see the message "Success: Added the item Hungry Hippos shopcart 1"')
-# def step_impl(context):
-#     raise NotImplementedError(u'STEP: Then I should see the message "Success: Added the item Hungry Hippos shopcart 1"')
+@then(u'I should see the message "{message}"')
+def step_impl(context, message):
+    found = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
+        expected_conditions.text_to_be_present_in_element(
+            (By.ID, 'flash_message'),
+            message
+        )
+    )
+    expect(found).to_be(True)
