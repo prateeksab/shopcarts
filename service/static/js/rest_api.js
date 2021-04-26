@@ -6,7 +6,7 @@ $(function () {
 
     // Updates the form with data from the response
     function update_item_form_data(res) {
-        $("#shopcart_id_2").val(res.shopcart_id);
+        $("#shopcart_id_bottom").val(res.shopcart_id);
         $("#item_id").val(res.id);
         $("#item_name").val(res.item_name);
         $("#item_quantity").val(res.item_quantity);
@@ -15,15 +15,15 @@ $(function () {
 
     function update_shopcart_form(res){
         $("#shopcart_id").val(res.id);
-        $("#shopcart_customerid_bottom").val(res.customer_id);
-        $("#shopcart_id_2").val(res.id);
+        $("#shopcart_customerid").val(res.customer_id);
+        $("#shopcart_id_bottom").val(res.id);
     }
 
     /// Clears all form fields
     function clear_form_data() {
-        $("#shopcart_customerid_top").val("");
-        $("#shopcart_customerid_bottom").val("");
-        $("#shopcart_id_2").val("");
+        $("#shopcart_id_top").val("");
+        $("#shopcart_customerid").val("");
+        $("#shopcart_id_bottom").val("");
         $("#item_id").val("");
         $("#item_name").val("");
         $("#item_quantity").val("");
@@ -42,7 +42,7 @@ $(function () {
 
     $("#create-shopcart-btn").click(function () {
 
-        var customer_id = $("#shopcart_customerid_bottom").val();
+        var customer_id = $("#shopcart_customerid").val();
         var items_list = [];
 
         var data = {
@@ -76,7 +76,7 @@ $(function () {
     // Add Items to cart
     // ***************************************
     $("#add-item-btn").click(function(){
-        var shopcart_id = $("#shopcart_id_2").val();
+        var shopcart_id = $("#shopcart_id_bottom").val();
         var item_name = $("#item_name").val();
         var item_quantity =$("#item_quantity").val();
         var item_price=$("#item_price").val();
@@ -112,7 +112,7 @@ $(function () {
 
     $("#update-item-btn").click(function () {
 
-        var shopcart_id = $("#shopcart_id_2").val();
+        var shopcart_id = $("#shopcart_id_bottom").val();
         var item_id =  $("#item_id").val();
         var item_name = $("#item_name").val();
         var item_quantity = $("#item_quantity").val();
@@ -150,7 +150,7 @@ $(function () {
 
     $("#retrieve-btn").click(function () {
         console.log("Function works")
-        var shopcart_customerid = $("#shopcart_customerid_top").val();
+        var shopcart_id = $("#shopcart_id_top").val();
 
         var ajax = $.ajax({
             type: "GET",
@@ -163,18 +163,13 @@ $(function () {
             //alert(res.toSource())
             update_shopcart_form(res)
             var shopcart = res;
-            shopcart_id = shopcart.id
             customer_id = shopcart.customer_id
-            flash_message("Shopcart for Customer ID "+ customer_id + " exists")
+            flash_message("Shopcart for Customer ID " + customer_id + " exists")
             //flash_message(res.responseJSON.message)
         });
 
         ajax.fail(function(res){
-            clear_form_data()
-            var shopcart = res;
-            shopcart_id = shopcart.id;
-            //flash_message(res.responseJSON.message)
-            flash_message("Shopcart with ID "+ shopcart_id + " Does not exist.")
+            flash_message("Server error!")
         });
 
     });
@@ -184,8 +179,8 @@ $(function () {
     // ****************************************
 
     $("#delete-btn").click(function () {
-
-        var shopcart_customerid = $("#shopcart_customerid_top").val();
+        console.log("Function works")
+        var shopcart_id = $("#shopcart_id_top").val();
 
         var ajax = $.ajax({
             type: "DELETE",
@@ -195,10 +190,8 @@ $(function () {
         });
 
         ajax.done(function(res){
+            flash_message("Shopcart deleted")
             clear_form_data()
-            var shopcart = res;
-            shopcart_id = shopcart.id;
-            flash_message("shopcart " + shopcart_id + " has been Deleted!")
         });
 
         ajax.fail(function(res){
@@ -212,7 +205,7 @@ $(function () {
 
     $("#delete-item-btn").click(function () {
 
-        var shopcart_id = $("#shopcart_id_2").val();
+        var shopcart_id = $("#shopcart_id_bottom").val();
         var item_id = $("#item_id").val();
 
         var ajax = $.ajax({
@@ -291,7 +284,7 @@ $(function () {
     // ****************************************
 
     $("#list-items-btn").click(function(){
-        var shopcart_id = $("#shopcart_id_2").val();
+        var shopcart_id = $("#shopcart_id_bottom").val();
 
         var ajax = $.ajax({
             type: "GET",

@@ -270,15 +270,15 @@ def delete_item(shopcart_id, item_id):
 ######################################################################
 # RETRIEVE A SHOPCART
 ######################################################################
-@app.route("/shopcarts/<int:shopcart_id>", methods=["GET"])
-def get_shopcart(shopcart_id):
+@app.route("/shopcarts/<int:id>", methods=["GET"])
+def get_shopcart(id):
     """
     Retrieve a single Shopcart
     This endpoint will return a Shopcart based on it's id
     """
-    app.logger.info("Request for shopcart with id: %s", shopcart_id)
+    app.logger.info("Request for shopcart with id: %s", id)
 
-    shopcart = Shopcart.find_or_404(shopcart_id)
+    shopcart = Shopcart.find_or_404(id)
     return make_response(jsonify(shopcart.serialize()), status.HTTP_200_OK)
 
 ######################################################################
