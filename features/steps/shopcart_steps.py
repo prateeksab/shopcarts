@@ -89,7 +89,7 @@ def step_impl(context):
 @when(u'I visit the "Home Page"')
 def step_impl(context):
     context.driver.get(context.base_url)
-    context.driver.save_screenshot('homepage_check.png')
+    # context.driver.save_screenshot('homepage_check.png')
 
 @then(u'I should see "{message}"')
 def step_impl(context, message):
