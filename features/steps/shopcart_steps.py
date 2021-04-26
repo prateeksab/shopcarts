@@ -89,7 +89,7 @@ def step_impl(context):
 @when(u'I visit the "Home Page"')
 def step_impl(context):
     context.driver.get(context.base_url)
-    # context.driver.save_screenshot('homepage.png')
+    context.driver.save_screenshot('homepage_check.png')
 
 @then(u'I should see "{message}"')
 def step_impl(context, message):
@@ -97,8 +97,8 @@ def step_impl(context, message):
 
 @then(u'I should not see "{message}"')
 def step_impl(context, message):
-    error_msg = "I should not see '%s' in '%s'" % (message, context.resp.text)
-    ensure(message in context.resp.text, False, error_msg)
+    error_msg = 'I should not see "%s" in "%s"' % (message, context.driver.title)
+    ensure(message in context.driver.title, False, error_msg)
 
 @when(u'I set the "{element_name}" field to "{text_string}"')
 def step_impl(context, element_name, text_string):
@@ -122,3 +122,32 @@ def step_impl(context, message):
         )
     )
     expect(found).to_be(True)
+
+##################################################################
+# These two function simulate copy and paste
+##################################################################
+@when(u'I copy the "{element_name}" field')
+def step_impl(context, element_name):
+    element_id = element_name.lower()
+    # element = context.driver.find_element_by_id(element_id)
+    element = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
+        expected_conditions.presence_of_element_located((By.ID, element_id))
+    )
+    context.clipboard = element.get_attribute('value')
+    logging.info('Clipboard contains: %s', context.clipboard)
+
+@when('I paste the "{element_name}" field')
+def step_impl(context, element_name):
+    element_id = element_name.lower()
+    # element = context.driver.find_element_by_id(element_id)
+    element = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
+        expected_conditions.presence_of_element_located((By.ID, element_id))
+    )
+    element.clear()
+    element.send_keys(context.clipboard)
+
+@then(u'the "{element_name}" field should be empty')
+def step_impl(context, element_name):
+    element_id = element_name.lower()
+    element = context.driver.find_element_by_id(element_id)
+    expect(element.get_attribute('value')).to_be(u'')
