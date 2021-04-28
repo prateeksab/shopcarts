@@ -1,3 +1,5 @@
+---
+# This manifest deploys a Python Flask application with a Cloudant database
 - name: nyu-shopcart-service-s21-prod
   path: .
   instances: 1
