@@ -59,7 +59,7 @@ from selenium.webdriver.support import expected_conditions
 #     headers = {"Content-Type": "application/json"}
 #     create_url = context.base_url + "/shopcarts/"
     
-#     for row in context.table:
+#     -for row in context.table:
 #         data = {
 #             "shopcart_id": row["shopcart_id"],
 #             "id": row["id"],
