@@ -76,3 +76,11 @@ Scenario: Add an item to a shopcart, and then delete the entire shopcart
     When I paste the "Shopcart_ID_top" field
     And I press the "Delete" button
     Then I should see the message "Shopcart deleted"
+
+Scenario: List all items in a shopcart
+    When I visit the "Home Page"
+    And I set the "Shopcart_ID_bottom" to "1"
+    And I press the "List-Items" button
+    Then I should see "burger" in the results
+    And I should not see "toy" in the results
+    And I should not see "watch" in the results
