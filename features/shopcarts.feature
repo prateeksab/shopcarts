@@ -76,3 +76,28 @@ Scenario: Add an item to a shopcart, and then delete the entire shopcart
     When I paste the "Shopcart_ID_top" field
     And I press the "Delete" button
     Then I should see the message "Shopcart deleted"
+
+Scenario: List all items in a shopcart
+    When I visit the "Home Page"
+    And I set the "Shopcart_CustomerID" field to "245"
+    And I press the "Create-Shopcart" button
+    Then I should see the message "Successfully created the shopcart for customer: 245"
+    When I copy the "Shopcart_ID_bottom" field
+    When I press the "Clear" button
+    Then the "Shopcart_ID_top" field should be empty
+    And the "Shopcart_ID_bottom" field should be empty
+    When I paste the "Shopcart_ID_top" field
+    And I press the "Retrieve" button
+    Then I should see the message "Shopcart for Customer ID 245 exists"
+    When I set the "Item_ID" field to "2"
+    And I set the "Item_Name" field to "iPod MAX"
+    And I set the "Item_Quantity" field to "5"
+    And I set the "Item_Price" field to "999.99"
+    And I press the "Add-Item" button
+    And I press the "Clear" button
+    And I paste the "Shopcart_ID_bottom" field
+    And I paste the "Shopcart_ID_top" field
+    And I press the "List-Items" button
+    Then I should see "iPod MAX" in the results
+    And I should not see "toy" in the results
+    And I should not see "watch" in the results
