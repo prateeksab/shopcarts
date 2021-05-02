@@ -101,3 +101,34 @@ Scenario: List all items in a shopcart
     Then I should see "iPod MAX" in the results
     And I should not see "toy" in the results
     And I should not see "watch" in the results
+
+Scenario: Checkout a shopcart
+    When I visit the "Home Page"
+    And I set the "Shopcart_CustomerID" field to "9876"
+    And I press the "Create-Shopcart" button
+    Then I should see the message "Successfully created the shopcart for customer: 9876"
+    When I copy the "Shopcart_ID_bottom" field
+    When I press the "Clear" button
+    Then the "Shopcart_ID_top" field should be empty
+    And the "Shopcart_ID_bottom" field should be empty
+    When I paste the "Shopcart_ID_top" field
+    And I press the "Retrieve" button
+    Then I should see the message "Shopcart for Customer ID 9876 exists"
+    When I set the "Item_ID" field to "5"
+    And I set the "Item_Name" field to "Soccer Ball"
+    And I set the "Item_Quantity" field to "3"
+    And I set the "Item_Price" field to "13.56"
+    And I press the "Add-Item" button
+    Then I should see the message "Success! Added 3 Soccer Ball to this shopcart"
+    When I set the "Item_ID" field to "8"
+    And I set the "Item_Name" field to "Racecar"
+    And I set the "Item_Quantity" field to "44"
+    And I set the "Item_Price" field to "120.32"
+    And I press the "Add-Item" button
+    Then I should see the message "Success! Added 44 Racecar to this shopcart"
+    When I press the "Clear" button
+    Then the "Shopcart_ID_top" field should be empty
+    And the "Shopcart_ID_bottom" field should be empty
+    When I paste the "Shopcart_ID_top" field
+    And I press the "Checkout" button
+    Then I should see the message "Thank you for your purchase. Shopcart successfully checked out."
