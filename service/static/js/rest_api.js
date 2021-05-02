@@ -200,6 +200,31 @@ $(function () {
     });
 
     // ****************************************
+    // Checkout a Shopcart
+    // ****************************************
+
+    $("#checkout-btn").click(function () {
+        console.log("Function works")
+        var shopcart_id = $("#shopcart_id_top").val();
+
+        var ajax = $.ajax({
+            type: "PUT",
+            url: "/shopcarts/" + shopcart_id,
+            contentType: "application/json",
+            data: ''
+        });
+
+        ajax.done(function(res){
+            flash_message("Thank you for your purchase. Shopcart successfully checked out.")
+            clear_form_data()
+        });
+
+        ajax.fail(function(res){
+            flash_message("Server error!")
+        });
+    });
+
+    // ****************************************
     // Delete an item in a shopcart
     // ****************************************
 
