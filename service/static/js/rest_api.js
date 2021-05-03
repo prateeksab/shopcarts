@@ -242,9 +242,7 @@ $(function () {
 
         ajax.done(function(res){
             clear_form_data()
-            var shopcart = res;
-            shopcart_id = shopcart.id;
-            flash_message("Item with id: " + item_id + "in shopcart: " + shopcart_id + " has been Deleted!")
+            flash_message("Item has been deleted!")
         });
 
         ajax.fail(function(res){
