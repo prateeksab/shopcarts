@@ -132,3 +132,14 @@ Scenario: Checkout a shopcart
     When I paste the "Shopcart_ID_top" field
     And I press the "Checkout" button
     Then I should see the message "Thank you for your purchase. Shopcart successfully checked out."
+
+Scenario: List all Shopcarts
+    When I visit the "Home Page"
+    And I press the "List-Shopcarts" button
+    Then I should see the message "Success"
+    Then I should see "444" in the results
+    Then I should see "555" in the results
+    Then I should see "777" in the results
+    Then I should see "1" in the results
+    Then I should see "2" in the results
+    Then I should see "3" in the results
