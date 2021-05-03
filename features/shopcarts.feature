@@ -141,3 +141,26 @@ Scenario: List all Shopcarts
     When I press the "List-Shopcarts" button
     Then I should see the message "Success"
     Then I should see "444" in the results
+
+Scenario: Add an item to a shopcart, and then delete the item from the shopcart
+    When I visit the "Home Page"
+    And I set the "Shopcart_CustomerID" field to "245"
+    And I press the "Create-Shopcart" button
+    Then I should see the message "Successfully created the shopcart for customer: 245"
+    When I copy the "Shopcart_ID_bottom" field
+    When I press the "Clear" button
+    Then the "Shopcart_ID_top" field should be empty
+    And the "Shopcart_ID_bottom" field should be empty
+    When I paste the "Shopcart_ID_top" field
+    And I press the "Retrieve" button
+    Then I should see the message "Shopcart for Customer ID 245 exists"
+    When I set the "Item_ID" field to "564"
+    And I set the "Item_Name" field to "iPod MAX"
+    And I set the "Item_Quantity" field to "5"
+    And I set the "Item_Price" field to "999.99"
+    And I press the "Add-Item" button
+    Then I should see the message "Success! Added 5 iPod MAX to this shopcart"
+    When I set the "Item_ID" field to "564"
+    And I paste the "Shopcart_ID_bottom" field
+    And I press the "Delete-Item" button
+    Then I should see the message "Item has been deleted!"
