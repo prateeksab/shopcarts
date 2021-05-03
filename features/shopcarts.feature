@@ -132,3 +132,12 @@ Scenario: Checkout a shopcart
     When I paste the "Shopcart_ID_top" field
     And I press the "Checkout" button
     Then I should see the message "Thank you for your purchase. Shopcart successfully checked out."
+
+Scenario: List all Shopcarts
+    When I visit the "Home Page"
+    And I set the "Shopcart_CustomerID" field to "444"
+    And I press the "Create-Shopcart" button
+    Then I should see the message "Successfully created the shopcart for customer: 444"
+    When I press the "List-Shopcarts" button
+    Then I should see the message "Success"
+    Then I should see "444" in the results
